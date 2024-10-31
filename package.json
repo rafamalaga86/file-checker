@@ -1,0 +1,15 @@
+{
+  "name": "file-checker",
+  "version": "1.0.0",
+  "description": "Script to check for duplicate filenames and calculate checksums",
+  "main": "file-checker.js",
+  "scripts": {
+    "launch": "node file-checker.js",
+    "create-tables": "node create-tables.js"
+  },
+  "author": "Bard",
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "^3.3.1"
+  }
+}
