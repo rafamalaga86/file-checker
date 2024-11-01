@@ -1,13 +1,26 @@
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
+// const crypto = require('crypto');
 const mysql = require('mysql2/promise');
-const config = require('./config');
+const { config } = require('./config');
+const { spawnSync } = require('node:child_process');
+
+const execSync = require('child_process').execSync;
+code = execSync('node -v');
 
 const ignoredFilesAndDirs = config.ignoredFilesAndDirs;
 const dbConfig = config.dbConfig;
-const fileNames = new Set();
 const fileList = new Set();
+const fileNames = new Set();
+
+function consoleLogError(message) {
+  const red = '\x1b[31m';
+  const reset = '\x1b[0m';
+  console.error(red + message + reset);
+}
+function consoleLog(message) {
+  console.log(message);
+}
 
 function receiveArguments() {
   // Get directory path from command line arguments
@@ -15,17 +28,23 @@ function receiveArguments() {
 
   // Validate directory path
   if (!directoryPath) {
-    console.error('Error: Please provide a directory path as an argument.');
+    consoleLogError('Error: Please provide a directory path as an argument.');
     process.exit(1);
   }
 
   return directoryPath;
 }
 
+function exec(cmd, args) {
+  const processResult = spawnSync(cmd, args, {
+    encoding: 'utf8',
+    shell: true,
+  });
+  return processResult;
+}
+
 async function getFileList(currentDir) {
   const files = fs.readdirSync(currentDir);
-  // console.log('Escupe: ', files);
-  // process.exit(0);
 
   for (const file of files) {
     const filePath = path.join(currentDir, file);
@@ -67,32 +86,41 @@ async function main() {
       [commandStartTime, '', '', 'running']
     );
     commandExecutionId = result.insertId; // Assign commandExecutionId here
+    consoleLog(`Launched checksum process with ID: ${commandExecutionId}`);
 
-    // Function to recursively traverse the directory and process files
-    async function processDirectory(currentDir) {
-      for (const filePath of fileList) {
-        try {
-          // Calculate checksum
-          const fileContent = fs.readFileSync(filePath);
-          const checksum = crypto.createHash('sha256').update(fileContent).digest('hex');
+    for (const filePath of fileList) {
+      const filePathArray = filePath.split('/');
+      const fileName = filePathArray[filePathArray.length - 1];
+      let checksum;
 
-          // Insert checksum data into the database
-          const [result] = await connection.execute(
-            'INSERT INTO checksum (hd, filename, checksum, command_execution_id) VALUES (?, ?, ?, ?)',
-            [directoryPath, filePath, checksum, commandExecutionId]
-          );
-          const parts = filePath.split('/');
-          const file = parts[parts.length - 1];
-          console.log(`Checksum for ${file} inserted with ID: ${result.insertId}`);
-        } catch (err) {
-          console.error(`Error calculating checksum for ${filePath}:`, err);
+      try {
+        // const commandResult = exec('ls /un/directorio/que/no/existe');
+        const commandResult = await exec(`sha256sum "${filePath}"`);
+
+        const stdoutString = commandResult.stdout.toString();
+        const stderrString = commandResult.stderr.toString();
+        const stdout = stdoutString.split('  ');
+        checksum = stdout[0];
+
+        if (stderrString) {
+          consoleLogError(`Error calculating checksum for ${filePath}:`, stderrString);
         }
+        if (checksum) {
+          consoleLog(`${fileName} -> ${checksum}`);
+        }
+      } catch (err) {
+        // consoleLogError(`Error calculating checksum for ${filePath}:`, err);
+        consoleLogError(err);
+        continue;
       }
+
+      // Insert checksum data into the database
+      const [result] = await connection.execute(
+        'INSERT INTO checksum (hd, filename, checksum, command_execution_id) VALUES (?, ?, ?, ?)',
+        [directoryPath, filePath, checksum, commandExecutionId]
+      );
+      consoleLog(`Inserted with ID: ${result.insertId}`);
     }
-
-    // Process the provided directory
-    await processDirectory(directoryPath);
-
     // Update command execution status to 'success'
     const commandEndTime = new Date();
     await connection.execute(
@@ -100,10 +128,8 @@ async function main() {
       ['success', commandEndTime, commandExecutionId]
     );
 
-    console.log('File check completed successfully.');
+    consoleLog('File check completed successfully.');
   } catch (err) {
-    console.error('Error:', err);
-
     // Store command execution data with error information
     const commandEndTime = new Date();
     const commandExecutionStatus = 'failure';
@@ -111,8 +137,7 @@ async function main() {
       'INSERT INTO command_executions (created_at, stdout, stderr, status, ended_at) VALUES (?, ?, ?, ?, ?)',
       [commandStartTime, '', err.message, commandExecutionStatus, commandEndTime]
     );
-
-    process.exit(1);
+    throw err;
   } finally {
     // Close the database connection
     if (connection) {
