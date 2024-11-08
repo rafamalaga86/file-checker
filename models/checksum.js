@@ -41,4 +41,19 @@ async function getById(id) {
   return result;
 }
 
-module.exports = { registerChecksum, getById };
+async function listProcesses() {
+  const connection = await getDbConnection();
+
+  // Insert checksum data into the database
+  const [result] = await connection.execute(
+    `SELECT DISTINCT command_execution_id, source, status, created_at, ended_at
+    FROM checksums
+    JOIN command_executions ON command_executions.id = checksums.command_execution_id
+    ORDER BY command_execution_id
+    ;`
+  );
+
+  return result;
+}
+
+module.exports = { registerChecksum, getById, listProcesses };

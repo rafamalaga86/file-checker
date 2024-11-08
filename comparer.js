@@ -1,4 +1,5 @@
 const { getById } = require('./models/checksum');
+const { consoleLog } = require('./loggers');
 
 function receiveArguments() {
   const id1 = process.argv[2];
@@ -16,12 +17,18 @@ async function main() {
   const process1Stringified = process1.map(item => JSON.stringify(item));
   const process2Stringified = process2.map(item => JSON.stringify(item));
 
-  const filtered = process1Stringified.filter(x => !process2Stringified.includes(x));
+  const filtered1 = process1Stringified.filter(x => !process2Stringified.includes(x));
   const filtered2 = process2Stringified.filter(x => !process1Stringified.includes(x));
 
-  console.log(process1.length, process2.length);
-  console.log(filtered.length, filtered2.length);
-  process.exit(1);
+  consoleLog(`Process ${id1} has ${process1.length} files.`);
+  consoleLog(`Process ${id2} has ${process2.length} files.`);
+  consoleLog(
+    `Process ${id1} has ${filtered1.length} files that are not in process ${id2}`
+  );
+  consoleLog(
+    `Process ${id2} has ${filtered2.length} files that are not in process ${id1}`
+  );
+  process.exit(0);
 }
 
 main();
