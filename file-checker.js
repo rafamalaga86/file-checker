@@ -1,5 +1,9 @@
 const { consoleLogError, consoleLog } = require('./loggers');
-const { getFileList, getFileNameDuplicates } = require('./file-management');
+const {
+  getFileList,
+  getFileNameDuplicates,
+  getFileNameFromPath,
+} = require('./file-management');
 const {
   startCommandExecution,
   finishCommandExecution,
@@ -30,7 +34,7 @@ async function main() {
   const fileList = await getFileList(directoryPath);
   const duplicates = await getFileNameDuplicates(fileList);
 
-  if (duplicates) {
+  if (duplicates.length !== 0) {
     consoleLog('There are duplicates:');
     consoleLog(duplicates);
     process.exit(1);
@@ -47,8 +51,7 @@ async function main() {
     consoleLog(`Launched command process with ID: ${commandExecutionId}`);
 
     for (const filePath of fileList) {
-      const filePathArray = filePath.split('/');
-      const fileName = filePathArray[filePathArray.length - 1];
+      const fileName = getFileNameFromPath(filePath);
       let checksum;
 
       // const commandResult = exec('ls /un/directorio/que/no/existe');
