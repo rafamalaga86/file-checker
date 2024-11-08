@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 const readline = require('readline');
-const config = require('./config');
+const { config } = require('./config');
 
 async function main() {
   const readlineInterface = readline.createInterface({
@@ -26,15 +26,13 @@ async function run() {
     // Connect to the database
     connection = await mysql.createConnection(dbConfig);
 
-    await connection.execute(`DROP TABLE IF EXISTS checksum`);
+    await connection.execute(`DROP TABLE IF EXISTS checksums`);
     await connection.execute(`DROP TABLE IF EXISTS command_executions`);
 
     // Create command executions table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS command_executions (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        stdout TEXT,
-        stderr TEXT,
         status VARCHAR(255) NOT NULL,
         created_at DATETIME NOT NULL,
         ended_at DATETIME
@@ -44,12 +42,14 @@ async function run() {
 
     // Create checksum table
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS checksum (
+      CREATE TABLE IF NOT EXISTS checksums (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         command_execution_id BIGINT UNSIGNED,
-        hd VARCHAR(255) NOT NULL,
-        filename VARCHAR(255) NOT NULL,
+        source VARCHAR(255) NOT NULL,
+        file VARCHAR(255) NOT NULL,
         checksum VARCHAR(255) NOT NULL,
+        stdout TEXT,
+        stderr TEXT,
         FOREIGN KEY (command_execution_id) REFERENCES command_executions(id)
       )
     `);
