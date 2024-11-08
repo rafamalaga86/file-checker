@@ -1,5 +1,5 @@
 const { consoleLogError, consoleLog } = require('./loggers');
-const { getFileList } = require('./file-management');
+const { getFileList, getFileNameDuplicates } = require('./file-management');
 const {
   startCommandExecution,
   finishCommandExecution,
@@ -28,6 +28,13 @@ function receiveArguments() {
 async function main() {
   let { directoryPath, commandExecutionId } = receiveArguments();
   const fileList = await getFileList(directoryPath);
+  const duplicates = await getFileNameDuplicates(fileList);
+
+  if (duplicates) {
+    consoleLog('There are duplicates:');
+    consoleLog(duplicates);
+    process.exit(1);
+  }
 
   let connection;
 

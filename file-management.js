@@ -30,4 +30,24 @@ async function getFileList(currentDir) {
   return fileList;
 }
 
-module.exports = { getFileList };
+async function getFileNameDuplicates(fileList) {
+  const files = Array.from(fileList).map(filePath => {
+    const filePathArray = filePath.split('/');
+    return [filePath, filePathArray[filePathArray.length - 1]];
+  });
+
+  const unique = new Set();
+  const duplicates = files.filter(pathFile => {
+    const filename = pathFile[1];
+    if (unique.has(filename)) {
+      return true;
+    } else {
+      unique.add(filename);
+      return false;
+    }
+  });
+
+  return duplicates;
+}
+
+module.exports = { getFileList, getFileNameDuplicates };
