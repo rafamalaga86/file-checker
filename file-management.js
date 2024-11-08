@@ -40,13 +40,26 @@ async function getFileNameDuplicates(fileList) {
     const filename = pathFile[1];
     if (unique.has(filename)) {
       return true;
-    } else {
-      unique.add(filename);
-      return false;
     }
+    unique.add(filename);
+    return false;
   });
 
-  return duplicates;
+  const result = [];
+  for (const duplicate of duplicates) {
+    const filename = duplicate[1];
+    const locations = [];
+
+    for (const file of files) {
+      if (file[1] == filename) {
+        locations.push(file[0]);
+      }
+    }
+
+    result.push({ filename, locations });
+  }
+
+  return result;
 }
 
 function getFileNameFromPath(filePath) {

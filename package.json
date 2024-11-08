@@ -5,6 +5,7 @@
   "main": "file-checker.js",
   "scripts": {
     "launch": "node file-checker.js",
+    "compare": "node comparer.js",
     "create-tables": "node create-tables.js"
   },
   "author": "Bard",

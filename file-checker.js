@@ -8,7 +8,6 @@ const {
   startCommandExecution,
   finishCommandExecution,
 } = require('./models/commandExecutions');
-const { getDbConnection } = require('./db');
 const { registerChecksum } = require('./models/checksum');
 const { exec } = require('./exec');
 
@@ -40,11 +39,7 @@ async function main() {
     process.exit(1);
   }
 
-  let connection;
-
   try {
-    connection = await getDbConnection();
-
     if (!commandExecutionId) {
       commandExecutionId = await startCommandExecution();
     }
@@ -87,9 +82,7 @@ async function main() {
     throw err;
   } finally {
     // Close the database connection
-    if (connection) {
-      connection.end();
-    }
+    closeConnection();
   }
 }
 

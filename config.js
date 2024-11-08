@@ -23,9 +23,10 @@ const config = {
     '.Spotlight-V100',
     '.TemporaryItems',
     '.sync.ffs_db',
+    'sync.ffs_lock',
     '.fseventsd',
   ],
-  dbConfig: databases.testDbConfig,
+  dbConfig: databases.prodDbConfig,
 };
 
 module.exports = { config };

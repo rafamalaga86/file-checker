@@ -10,4 +10,8 @@ async function getDbConnection() {
   return connection;
 }
 
-module.exports = { getDbConnection };
+function closeConnection() {
+  connection.end();
+}
+
+module.exports = { getDbConnection, closeConnection };

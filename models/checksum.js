@@ -29,4 +29,16 @@ async function registerChecksum(
   return result.insertId;
 }
 
-module.exports = { registerChecksum };
+async function getById(id) {
+  const connection = await getDbConnection();
+
+  // Insert checksum data into the database
+  const [result] = await connection.execute(
+    'SELECT file, checksum FROM checksums WHERE command_execution_id = ?',
+    [id]
+  );
+
+  return result;
+}
+
+module.exports = { registerChecksum, getById };
