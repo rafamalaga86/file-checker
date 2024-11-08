@@ -1,3 +1,5 @@
+const { getDbConnection } = require('../db');
+
 async function registerChecksum(
   directoryPath,
   filePath,
@@ -6,13 +8,15 @@ async function registerChecksum(
   stdoutString,
   stderrString
 ) {
+  const connection = await getDbConnection();
+
   // Insert checksum data into the database
   const [result] = await connection.execute(
-    'INSERT INTO checksum (source, file, checksum, command_execution_id, stdout, stderr) VALUES (?, ?, ?, ?)',
+    'INSERT INTO checksums (source, file_path, checksum, command_execution_id, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?)',
     [directoryPath, filePath, checksum, commandExecutionId, stdoutString, stderrString]
   );
 
-  return result.id;
+  return result.insertId;
 }
 
 module.exports = { registerChecksum };

@@ -46,7 +46,7 @@ async function run() {
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         command_execution_id BIGINT UNSIGNED,
         source VARCHAR(255) NOT NULL,
-        file VARCHAR(255) NOT NULL,
+        file_path VARCHAR(255) NOT NULL,
         checksum VARCHAR(255) NOT NULL,
         stdout TEXT,
         stderr TEXT,

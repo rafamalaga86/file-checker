@@ -1,14 +1,12 @@
-const mysql = require('mysql2/promise');
-const { config } = require('./config');
 const { consoleLogError, consoleLog } = require('./loggers');
 const { getFileList } = require('./file-management');
 const {
   startCommandExecution,
   finishCommandExecution,
 } = require('./models/commandExecutions');
+const { getDbConnection } = require('./db');
 const { registerChecksum } = require('./models/checksum');
-
-const dbConfig = config.dbConfig;
+const { exec } = require('./exec');
 
 function receiveArguments() {
   const directoryPath = process.argv[2];
@@ -22,7 +20,7 @@ function receiveArguments() {
   if (process.argv.includes('-p')) {
     const index = process.argv.indexOf('-p');
     commandExecutionId = process.argv[index + 1];
-    console.log(`El valor de -p es: ${commandExecutionId}`);
+    consoleLog(`El valor de -p es: ${commandExecutionId}`);
   }
   return { directoryPath, commandExecutionId };
 }
@@ -31,14 +29,13 @@ async function main() {
   let { directoryPath, commandExecutionId } = receiveArguments();
   const fileList = await getFileList(directoryPath);
 
-  let connection, commandStartTime;
+  let connection;
 
   try {
-    connection = await mysql.createConnection(dbConfig);
-    commandStartTime = new Date();
+    connection = await getDbConnection();
 
     if (!commandExecutionId) {
-      commandExecutionId = startCommandExecution();
+      commandExecutionId = await startCommandExecution();
     }
     consoleLog(`Launched command process with ID: ${commandExecutionId}`);
 
@@ -62,14 +59,21 @@ async function main() {
         consoleLog(`${fileName} -> ${checksum}`);
       }
 
-      const id = registerChecksum();
+      const id = await registerChecksum(
+        directoryPath,
+        filePath,
+        checksum,
+        commandExecutionId,
+        stdoutString,
+        stderrString
+      );
 
       consoleLog(`Inserted checksum with ID: ${id}`);
     }
-    finishCommandExecution(commandExecutionId, 'success');
+    await finishCommandExecution(commandExecutionId, 'success');
     consoleLog('File check completed successfully.');
   } catch (err) {
-    finishCommandExecution(commandExecutionId, 'failure');
+    await finishCommandExecution(commandExecutionId, 'failure');
     throw err;
   } finally {
     // Close the database connection
