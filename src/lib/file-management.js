@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { config } = require('./config');
+const { config } = require('../config/config');
 
 const ignoredFilesAndDirs = config.ignoredFilesAndDirs;
 
@@ -67,9 +67,9 @@ function getFileNameFromPath(filePath) {
   return filePathArray[filePathArray.length - 1];
 }
 
-function hasDirAccess(directoryPath) {
+function hasDirAccess(dir) {
   try {
-    fs.accessSync(directoryPath, fs.constants.F_OK);
+    fs.accessSync(dir, fs.constants.F_OK);
     return true;
   } catch (err) {
     return false;

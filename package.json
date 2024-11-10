@@ -4,13 +4,13 @@
   "description": "Script to check for duplicate filenames and calculate checksums",
   "main": "file-checker.js",
   "scripts": {
-    "launch": "node file-checker.js",
-    "list": "node list.js",
-    "retry": "node retry.js",
-    "complete": "node complete.js",
-    "delete": "node delete.js",
-    "compare": "node comparer.js",
-    "create-tables": "node create-tables.js"
+    "check": "node ./src/commands/check.js",
+    "list": "node ./src/commands/list.js",
+    "retry": "node ./src/commands/retry.js",
+    "complete": "node ./src/commands/complete.js",
+    "delete": "node ./src/commands/delete.js",
+    "compare": "node ./src/commands/compare.js",
+    "create-tables": "node ./src/commands/create-tables.js"
   },
   "author": "Bard",
   "license": "ISC",

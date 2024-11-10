@@ -30,13 +30,13 @@ async function run() {
     }
 
     const fileList = failed.map(item => item.file_path);
-    const directoryPath = failed[0].source;
-    if (!hasDirAccess(directoryPath)) {
-      consoleLogError('There are no access to dir: ' + directoryPath);
+    const dir = failed[0].dir;
+    if (!hasDirAccess(dir)) {
+      consoleLogError('There are no access to dir: ' + dir);
       process.exit(1);
     }
     await deleteFailedByCommandId(commandExecutionId);
-    await calculateChecksumOfFileList(commandExecutionId, fileList, directoryPath);
+    await calculateChecksumOfFileList(commandExecutionId, fileList, dir);
   } catch (err) {
     // await finishCommandExecution(commandExecutionId, 'failure');
     console.log('Escupe: err', err);

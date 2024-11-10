@@ -1,4 +1,4 @@
-const { getDbConnection } = require('../db');
+const { getDbConnection } = require('../lib/db');
 
 async function startCommandExecution() {
   const connection = await getDbConnection();
@@ -21,13 +21,13 @@ async function finishCommandExecution(commandExecutionId, status) {
   );
 }
 
-async function getDirectoryPath(commandExecutionId) {
+async function getDir(commandExecutionId) {
   const connection = await getDbConnection();
   const [result] = await connection.execute(
-    'SELECT source FROM checksums WHERE command_execution_id = ?',
+    'SELECT dir FROM checksums WHERE command_execution_id = ?',
     [commandExecutionId]
   );
-  return result[0].source;
+  return result[0].dir;
 }
 
-module.exports = { startCommandExecution, finishCommandExecution, getDirectoryPath };
+module.exports = { startCommandExecution, finishCommandExecution, getDir };

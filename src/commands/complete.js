@@ -1,14 +1,14 @@
-const { consoleLogError, consoleLog } = require('./loggers');
-const { getFileList, getFileNameDuplicates } = require('./file-management');
+const { consoleLogError, consoleLog } = require('../lib/loggers');
+const { getFileList, getFileNameDuplicates } = require('../lib/file-management');
 const {
   startCommandExecution,
   finishCommandExecution,
-  getDirectoryPath,
-} = require('./models/commandExecutions');
+  getDir,
+} = require('../models/commandExecutions');
 const {
   calculateChecksumOfFileList,
   getFilePathByCommandId,
-} = require('./models/checksum');
+} = require('../models/checksum');
 
 function receiveArguments() {
   const commandExecutionId = Number(process.argv[2]);
@@ -22,8 +22,8 @@ function receiveArguments() {
 
 async function run() {
   const commandExecutionId = receiveArguments();
-  const directoryPath = await getDirectoryPath(commandExecutionId);
-  const fileList = await getFileList(directoryPath);
+  const dir = await getDir(commandExecutionId);
+  const fileList = await getFileList(dir);
   const duplicates = await getFileNameDuplicates(fileList);
 
   if (duplicates.length !== 0) {
@@ -36,10 +36,10 @@ async function run() {
     const dbFiles = await getFilePathByCommandId(commandExecutionId);
     const fileListArray = Array.from(fileList);
     const filesToComplete = fileListArray.filter(item => !dbFiles.includes(item));
-    consoleLog(`Found ${fileListArray.length} files in ${directoryPath}`);
+    consoleLog(`Found ${fileListArray.length} files in ${dir}`);
     consoleLog(`Found ${dbFiles.length} files in the database`);
     consoleLog(`There are ${filesToComplete.length} files to complete`);
-    await calculateChecksumOfFileList(commandExecutionId, filesToComplete, directoryPath);
+    await calculateChecksumOfFileList(commandExecutionId, filesToComplete, dir);
   } catch (err) {
     await finishCommandExecution(commandExecutionId, 'failure');
     throw err;

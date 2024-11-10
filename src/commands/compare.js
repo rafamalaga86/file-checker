@@ -1,6 +1,13 @@
-const { getByCommandId } = require('./models/checksum');
-const { consoleLog } = require('./loggers');
-const { printYellow, printGreen, printBlue, printRed, eol, print } = require('./loggers');
+const { getByCommandId } = require('../models/checksum');
+const { consoleLog } = require('../lib/loggers');
+const {
+  printYellow,
+  printGreen,
+  printBlue,
+  printRed,
+  eol,
+  print,
+} = require('../lib/loggers');
 
 function receiveArguments() {
   const id1 = process.argv[2];

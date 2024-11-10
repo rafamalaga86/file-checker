@@ -1,5 +1,5 @@
-const { deleteByCommandId } = require('./models/checksum');
-const { consoleLog } = require('./loggers');
+const { deleteByCommandId } = require('../models/checksum');
+const { consoleLog } = require('../lib/loggers');
 
 function receiveArguments() {
   const id = process.argv[2];

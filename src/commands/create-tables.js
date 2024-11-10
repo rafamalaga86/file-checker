@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 const readline = require('readline');
-const { config } = require('./config');
+const { config } = require('../config/config');
 
 async function main() {
   const readlineInterface = readline.createInterface({
@@ -33,6 +33,7 @@ async function run() {
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS command_executions (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        dir VARCHAR(255) NOT NULL,
         status VARCHAR(255) NOT NULL,
         created_at DATETIME NOT NULL,
         ended_at DATETIME
@@ -45,7 +46,6 @@ async function run() {
       CREATE TABLE IF NOT EXISTS checksums (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         command_execution_id BIGINT UNSIGNED,
-        source VARCHAR(255) NOT NULL,
         file_path VARCHAR(255) NOT NULL,
         file VARCHAR(255) NOT NULL,
         checksum VARCHAR(255) NOT NULL,

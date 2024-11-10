@@ -1,10 +1,9 @@
-const { consoleLogError, consoleLog } = require('../loggers');
-const { getDbConnection } = require('../db');
-const { getFileNameFromPath } = require('../file-management');
-const { exec } = require('../exec');
+const { consoleLogError, consoleLog, eol, print, printGreen } = require('../lib/loggers');
+const { getDbConnection } = require('../lib/db');
+const { getFileNameFromPath } = require('../lib/file-management');
+const { exec } = require('../lib/exec');
 
 async function registerChecksum(
-  directoryPath,
   filePath,
   checksum,
   commandExecutionId,
@@ -16,16 +15,8 @@ async function registerChecksum(
 
   // Insert checksum data into the database
   const [result] = await connection.execute(
-    'INSERT INTO checksums (source, file_path, file, checksum, command_execution_id, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [
-      directoryPath,
-      filePath,
-      file,
-      checksum,
-      commandExecutionId,
-      stdoutString,
-      stderrString,
-    ]
+    'INSERT INTO checksums (file_path, file, checksum, command_execution_id, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?)',
+    [filePath, file, checksum, commandExecutionId, stdoutString, stderrString]
   );
 
   return result.insertId;
@@ -48,7 +39,7 @@ async function listProcesses() {
 
   // Insert checksum data into the database
   const [result] = await connection.execute(
-    `SELECT DISTINCT command_execution_id, source, status, created_at, ended_at
+    `SELECT DISTINCT command_execution_id, dir, status, created_at, ended_at
     FROM checksums
     JOIN command_executions ON command_executions.id = checksums.command_execution_id
     ORDER BY command_execution_id
@@ -87,7 +78,7 @@ async function getFailedByCommandId(commandExecutionId) {
 
   // Insert checksum data into the database
   const [result] = await connection.execute(
-    "SELECT file_path, source FROM checksums WHERE command_execution_id = ? AND checksum = ''",
+    "SELECT file_path FROM checksums WHERE command_execution_id = ? AND checksum = ''",
     [commandExecutionId]
   );
 
@@ -135,7 +126,10 @@ async function deleteByCommandId(commandExecutionId) {
 }
 
 async function calculateChecksumOfFileList(commandExecutionId, fileList, directoryPath) {
-  consoleLog(`Launched command process with ID: ${commandExecutionId}`);
+  print('Launched command process with ID: ');
+  printGreen(commandExecutionId);
+  eol();
+  eol();
 
   for (const filePath of fileList) {
     const fileName = getFileNameFromPath(filePath);
@@ -151,9 +145,6 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, directo
     if (stderrString) {
       consoleLogError(`Error calculating checksum for ${filePath}:`, stderrString);
     }
-    if (checksum) {
-      consoleLog(`${fileName} -> ${checksum}`);
-    }
 
     const id = await registerChecksum(
       directoryPath,
@@ -164,7 +155,11 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, directo
       stderrString
     );
 
-    consoleLog(`Inserted checksum with ID: ${id}`);
+    print('ID: ');
+    printGreen(id);
+    print(' | ' + fileName + ' -> ');
+    printGreen(checksum);
+    eol();
   }
   await finishCommandExecution(commandExecutionId, 'success');
   consoleLog('File check completed successfully.');

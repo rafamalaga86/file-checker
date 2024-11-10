@@ -10,7 +10,7 @@ Launch process in a directory.
 Create all tables neccesary
 `npm run create-tables`
 
-List all processes and source directories
+List all processes and target directories
 `npm run list`
 
 Compare two processes
