@@ -6,6 +6,8 @@
   "scripts": {
     "launch": "node file-checker.js",
     "list": "node list.js",
+    "retry": "node retry.js",
+    "delete": "node delete.js",
     "compare": "node comparer.js",
     "create-tables": "node create-tables.js"
   },

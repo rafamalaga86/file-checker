@@ -1,4 +1,4 @@
-const { getById } = require('./models/checksum');
+const { getByCommandId } = require('./models/checksum');
 const { consoleLog } = require('./loggers');
 const { printYellow, printGreen, printBlue, printRed, eol, print } = require('./loggers');
 
@@ -12,8 +12,8 @@ function receiveArguments() {
 async function main() {
   let { id1, id2 } = receiveArguments();
 
-  const process1 = await getById(id1);
-  const process2 = await getById(id2);
+  const process1 = await getByCommandId(id1);
+  const process2 = await getByCommandId(id2);
 
   const process1Stringified = process1.map(item => JSON.stringify(item));
   const process2Stringified = process2.map(item => JSON.stringify(item));
@@ -44,6 +44,12 @@ async function main() {
   printYellow(id2);
   eol();
 
+  if (filtered1.length > 0) {
+    print('Showing them: ');
+    eol();
+    console.log(filtered1);
+  }
+
   print('Process ');
   printYellow(id2);
   print(' has ');
@@ -52,6 +58,11 @@ async function main() {
   printYellow(id1);
   eol();
 
+  if (filtered2.length > 0) {
+    print('Showing them: ');
+    eol();
+    console.log(filtered2);
+  }
   process.exit(0);
 }
 

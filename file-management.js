@@ -67,4 +67,18 @@ function getFileNameFromPath(filePath) {
   return filePathArray[filePathArray.length - 1];
 }
 
-module.exports = { getFileList, getFileNameDuplicates, getFileNameFromPath };
+function hasDirAccess(directoryPath) {
+  try {
+    fs.accessSync(directoryPath, fs.constants.F_OK);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+module.exports = {
+  getFileList,
+  getFileNameDuplicates,
+  getFileNameFromPath,
+  hasDirAccess,
+};
