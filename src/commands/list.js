@@ -1,33 +1,17 @@
 const { listProcesses } = require('../models/checksum');
-const {
-  printYellow,
-  printGreen,
-  printBlue,
-  printRed,
-  eol,
-  print,
-} = require('../lib/loggers');
+const { printList } = require('../views/list');
 
 async function run() {
   const checksums = await listProcesses();
+  const rows = [];
 
   for (const checksum of checksums) {
     const dirSplitted = checksum.dir.split('/');
     const finalDir = dirSplitted[dirSplitted.length - 1];
-
-    printYellow(checksum.command_execution_id.toString() + ' ');
-    printRed(finalDir + ' ');
-    printGreen(checksum.dir + ' ');
-    print(checksum.status + ' ');
-    printBlue(checksum.created_at.toISOString() + ' ');
-
-    if (checksum.ended_at) {
-      process.stdout.write(' ');
-      process.stdout.write(checksum.ended_at.toISOString());
-    }
-    eol();
+    rows.push({ ...checksum, finalDir });
   }
 
+  printList(rows);
   process.exit(0);
 }
 

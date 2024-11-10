@@ -1,13 +1,13 @@
 const { getDbConnection } = require('../lib/db');
 
-async function startCommandExecution() {
+async function startCommandExecution(dir) {
   const connection = await getDbConnection();
   const commandStartTime = new Date();
   // Insert command execution data into the database FIRST
 
   const [result] = await connection.execute(
-    'INSERT INTO command_executions (created_at, status) VALUES (?, ?)',
-    [commandStartTime, 'running']
+    'INSERT INTO command_executions (created_at, status, dir) VALUES (?, ?, ?)',
+    [commandStartTime, 'running', dir]
   );
   return result.insertId; // Assign commandExecutionId here
 }
@@ -24,7 +24,7 @@ async function finishCommandExecution(commandExecutionId, status) {
 async function getDir(commandExecutionId) {
   const connection = await getDbConnection();
   const [result] = await connection.execute(
-    'SELECT dir FROM checksums WHERE command_execution_id = ?',
+    'SELECT dir FROM command_executions WHERE id = ?',
     [commandExecutionId]
   );
   return result[0].dir;

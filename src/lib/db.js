@@ -11,7 +11,9 @@ async function getDbConnection() {
 }
 
 function closeConnection() {
-  connection.end();
+  if (connection) {
+    connection.close();
+  }
 }
 
 module.exports = { getDbConnection, closeConnection };

@@ -1,10 +1,6 @@
 const { consoleLogError, consoleLog } = require('../lib/loggers');
 const { getFileList, getFileNameDuplicates } = require('../lib/file-management');
-const {
-  startCommandExecution,
-  finishCommandExecution,
-  getDir,
-} = require('../models/commandExecutions');
+const { finishCommandExecution, getDir } = require('../models/commandExecutions');
 const {
   calculateChecksumOfFileList,
   getFilePathByCommandId,
@@ -14,7 +10,7 @@ function receiveArguments() {
   const commandExecutionId = Number(process.argv[2]);
 
   if (isNaN(commandExecutionId) || commandExecutionId < 1) {
-    consoleLogError('The parameter is not a positive number');
+    consoleLogError('You should pass a parameter of a valid command execution id');
     process.exit(1);
   }
   return commandExecutionId;
@@ -36,6 +32,7 @@ async function run() {
     const dbFiles = await getFilePathByCommandId(commandExecutionId);
     const fileListArray = Array.from(fileList);
     const filesToComplete = fileListArray.filter(item => !dbFiles.includes(item));
+
     consoleLog(`Found ${fileListArray.length} files in ${dir}`);
     consoleLog(`Found ${dbFiles.length} files in the database`);
     consoleLog(`There are ${filesToComplete.length} files to complete`);

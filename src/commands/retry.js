@@ -1,12 +1,11 @@
-const { consoleLogError, consoleLog } = require('./loggers');
-const { finishCommandExecution } = require('./models/commandExecutions');
-const { hasDirAccess } = require('./file-management');
+const { consoleLogError, consoleLog } = require('../lib/loggers');
+const { finishCommandExecution, getDir } = require('../models/commandExecutions');
+const { hasDirAccess } = require('../lib/file-management');
 const {
   deleteFailedByCommandId,
   getFailedByCommandId,
   calculateChecksumOfFileList,
-} = require('./models/checksum');
-const { exec } = require('./exec');
+} = require('../models/checksum');
 
 function receiveArguments() {
   const id = process.argv[2];
@@ -25,12 +24,14 @@ async function run() {
     const failed = await getFailedByCommandId(commandExecutionId);
 
     if (failed.length === 0) {
-      consoleLogError('There are no checksums with that ID');
+      consoleLogError('There are no failed checksums with that command ID');
       process.exit(1);
     }
 
+    consoleLog(`There will be ${failed.length} retries.`);
+
     const fileList = failed.map(item => item.file_path);
-    const dir = failed[0].dir;
+    const dir = await getDir(commandExecutionId);
     if (!hasDirAccess(dir)) {
       consoleLogError('There are no access to dir: ' + dir);
       process.exit(1);
@@ -39,7 +40,6 @@ async function run() {
     await calculateChecksumOfFileList(commandExecutionId, fileList, dir);
   } catch (err) {
     // await finishCommandExecution(commandExecutionId, 'failure');
-    console.log('Escupe: err', err);
     throw err;
   } finally {
     // Close the database connection

@@ -8,23 +8,17 @@ const { calculateChecksumOfFileList } = require('../models/checksum');
 
 function receiveArguments() {
   const dir = process.argv[2];
-  let commandExecutionId;
 
   // Validate directory path
   if (!dir) {
     consoleLogError('Error: Please provide a directory path as an argument.');
     process.exit(1);
   }
-  if (process.argv.includes('-p')) {
-    const index = process.argv.indexOf('-p');
-    commandExecutionId = process.argv[index + 1];
-    consoleLog(`El valor de -p es: ${commandExecutionId}`);
-  }
-  return { dir, commandExecutionId };
+  return dir;
 }
 
 async function run() {
-  let { dir, commandExecutionId } = receiveArguments();
+  let dir = receiveArguments();
   const fileList = await getFileList(dir);
   const duplicates = await getFileNameDuplicates(fileList);
 
@@ -35,16 +29,16 @@ async function run() {
   }
 
   try {
-    if (!commandExecutionId) {
-      commandExecutionId = await startCommandExecution();
-    }
+    const commandExecutionId = await startCommandExecution(dir);
     calculateChecksumOfFileList(commandExecutionId, fileList, dir);
   } catch (err) {
     if (err.code === 'ECONNREFUSED') {
       consoleLogError('Could not make a successful connection to the database.');
       process.exit(1);
     }
-    await finishCommandExecution(commandExecutionId, 'failure');
+    if (commandExecutionId) {
+      await finishCommandExecution(commandExecutionId, 'failure');
+    }
     throw err;
   } finally {
     // Close the database connection

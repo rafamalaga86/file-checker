@@ -1,8 +1,10 @@
 const mysql = require('mysql2/promise');
 const readline = require('readline');
 const { config } = require('../config/config');
+const { closeConnection } = require('../lib/db');
+const { consoleLogError, consoleLog } = require('../lib/loggers');
 
-async function main() {
+async function run() {
   const readlineInterface = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -12,14 +14,14 @@ async function main() {
     'This will drop existing tables and create them again. Are you sure? (y/n): ',
     response => {
       if (response.toLowerCase() === 'y') {
-        run();
+        createTables();
       }
       readlineInterface.close();
     }
   );
 }
 
-async function run() {
+async function createTables() {
   const dbConfig = config.dbConfig;
   let connection;
   try {
@@ -37,9 +39,9 @@ async function run() {
         status VARCHAR(255) NOT NULL,
         created_at DATETIME NOT NULL,
         ended_at DATETIME
-      )
+      );
     `);
-    console.log('Command executions table created successfully.');
+    consoleLog('Command executions table created successfully.');
 
     // Create checksum table
     await connection.execute(`
@@ -52,17 +54,16 @@ async function run() {
         stdout TEXT,
         stderr TEXT,
         FOREIGN KEY (command_execution_id) REFERENCES command_executions(id)
-      )
+      );
     `);
-    console.log('Checksum table created successfully.');
+    consoleLog('Checksum table created successfully.');
   } catch (err) {
-    console.error('Error creating tables:', err);
+    consoleLogError('Error creating tables:');
+    consoleLog(err);
   } finally {
-    // Close the database connection
-    if (connection) {
-      connection.end();
-    }
+    closeConnection();
+    process.exit(1);
   }
 }
 
-main();
+run();

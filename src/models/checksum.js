@@ -147,7 +147,6 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, directo
     }
 
     const id = await registerChecksum(
-      directoryPath,
       filePath,
       checksum,
       commandExecutionId,
