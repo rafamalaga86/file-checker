@@ -44,7 +44,7 @@ async function run() {
     throw err;
   } finally {
     // Close the database connection
-    closeConnection();
+    // closeConnection();
   }
 }
 

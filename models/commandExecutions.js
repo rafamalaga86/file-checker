@@ -21,4 +21,13 @@ async function finishCommandExecution(commandExecutionId, status) {
   );
 }
 
-module.exports = { startCommandExecution, finishCommandExecution };
+async function getDirectoryPath(commandExecutionId) {
+  const connection = await getDbConnection();
+  const [result] = await connection.execute(
+    'SELECT source FROM checksums WHERE command_execution_id = ?',
+    [commandExecutionId]
+  );
+  return result[0].source;
+}
+
+module.exports = { startCommandExecution, finishCommandExecution, getDirectoryPath };

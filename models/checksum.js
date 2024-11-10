@@ -69,6 +69,19 @@ async function getByCommandId(commandExecutionId) {
 
   return result;
 }
+
+async function getFilePathByCommandId(commandExecutionId) {
+  const connection = await getDbConnection();
+
+  // Insert checksum data into the database
+  const [result] = await connection.execute(
+    'SELECT file_path FROM checksums WHERE command_execution_id = ?',
+    [commandExecutionId]
+  );
+
+  return result.map(item => item.file_path);
+}
+
 async function getFailedByCommandId(commandExecutionId) {
   const connection = await getDbConnection();
 
@@ -167,4 +180,5 @@ module.exports = {
   getByCommandId,
   getFailedByCommandId,
   deleteFailedByCommandId,
+  getFilePathByCommandId,
 };
