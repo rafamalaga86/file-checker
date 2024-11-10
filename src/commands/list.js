@@ -7,7 +7,10 @@ async function run() {
 
   for (const checksum of checksums) {
     const dirSplitted = checksum.dir.split('/');
-    const finalDir = dirSplitted[dirSplitted.length - 1];
+    let finalDir = dirSplitted[dirSplitted.length - 1];
+    if (finalDir === '') {
+      finalDir = dirSplitted[dirSplitted.length - 2];
+    }
     rows.push({ ...checksum, finalDir });
   }
 
