@@ -26,7 +26,7 @@ const config = {
     'sync.ffs_lock',
     '.fseventsd',
   ],
-  dbConfig: databases.prodDbConfig,
+  dbConfig: databases.testDbConfig,
 };
 
 module.exports = { config };

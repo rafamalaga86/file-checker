@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise');
 const readline = require('readline');
 const { config } = require('../config/config');
-const { closeConnection } = require('../lib/db');
+const { closeConnection, getDbConnection } = require('../lib/db');
 const { consoleLogError, consoleLog } = require('../lib/loggers');
 
 async function run() {
@@ -26,7 +26,7 @@ async function createTables() {
   let connection;
   try {
     // Connect to the database
-    connection = await mysql.createConnection(dbConfig);
+    const connection = await getDbConnection();
 
     await connection.execute(`DROP TABLE IF EXISTS checksums`);
     await connection.execute(`DROP TABLE IF EXISTS command_executions`);

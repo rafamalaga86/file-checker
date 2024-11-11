@@ -41,7 +41,7 @@ async function run() {
 
   try {
     const commandExecutionId = await startCommandExecution(dir);
-    calculateChecksumOfFileList(commandExecutionId, fileList);
+    await calculateChecksumOfFileList(commandExecutionId, fileList);
     await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
     if (commandExecutionId) {
