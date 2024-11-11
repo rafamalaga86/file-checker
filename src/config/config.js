@@ -1,19 +1,4 @@
-const databases = {
-  prodDbConfig: {
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'file-checker',
-    port: 6666,
-  },
-  testDbConfig: {
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'file-checker-test',
-    port: 6666,
-  },
-};
+require('dotenv').config();
 
 const config = {
   ignoredFilesAndDirs: [
@@ -26,7 +11,13 @@ const config = {
     'sync.ffs_lock',
     '.fseventsd',
   ],
-  dbConfig: databases.testDbConfig,
+  dbConfig: {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+  },
 };
 
 module.exports = { config };
