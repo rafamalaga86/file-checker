@@ -125,7 +125,10 @@ async function deleteByCommandId(commandExecutionId) {
   }
 }
 
-async function calculateChecksumOfFileList(commandExecutionId, fileList, directoryPath) {
+async function calculateChecksumOfFileList(commandExecutionId, fileList) {
+  if (fileList.length === 0) {
+    return;
+  }
   print('Launched command process with ID: ');
   printGreen(commandExecutionId);
   eol();
@@ -160,8 +163,6 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, directo
     printGreen(checksum);
     eol();
   }
-  await finishCommandExecution(commandExecutionId, 'success');
-  consoleLog('File check completed successfully.');
 }
 
 module.exports = {

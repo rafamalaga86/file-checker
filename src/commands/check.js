@@ -1,10 +1,15 @@
 const { consoleLogError, consoleLog } = require('../lib/loggers');
-const { getFileList, getFileNameDuplicates } = require('../lib/file-management');
+const {
+  getFileList,
+  getFileNameDuplicates,
+  hasDirAccess,
+} = require('../lib/file-management');
 const {
   startCommandExecution,
   finishCommandExecution,
 } = require('../models/commandExecutions');
 const { calculateChecksumOfFileList } = require('../models/checksum');
+const { shutDown } = require('../lib/shut-down');
 
 function receiveArguments() {
   const dir = process.argv[2];
@@ -19,6 +24,12 @@ function receiveArguments() {
 
 async function run() {
   let dir = receiveArguments();
+
+  if (!hasDirAccess(dir)) {
+    consoleLogError('There are no access to dir: ' + dir);
+    process.exit(1);
+  }
+
   const fileList = await getFileList(dir);
   const duplicates = await getFileNameDuplicates(fileList);
 
@@ -30,20 +41,17 @@ async function run() {
 
   try {
     const commandExecutionId = await startCommandExecution(dir);
-    calculateChecksumOfFileList(commandExecutionId, fileList, dir);
+    calculateChecksumOfFileList(commandExecutionId, fileList);
+    await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
-    if (err.code === 'ECONNREFUSED') {
-      consoleLogError('Could not make a successful connection to the database.');
-      process.exit(1);
-    }
     if (commandExecutionId) {
       await finishCommandExecution(commandExecutionId, 'failure');
     }
+    shutDown();
     throw err;
-  } finally {
-    // Close the database connection
-    // closeConnection();
   }
+  shutDown();
+  process.exit(0);
 }
 
 run();

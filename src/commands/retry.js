@@ -6,6 +6,7 @@ const {
   getFailedByCommandId,
   calculateChecksumOfFileList,
 } = require('../models/checksum');
+const { shutDown } = require('../lib/shut-down');
 
 function receiveArguments() {
   const id = process.argv[2];
@@ -37,14 +38,16 @@ async function run() {
       process.exit(1);
     }
     await deleteFailedByCommandId(commandExecutionId);
-    await calculateChecksumOfFileList(commandExecutionId, fileList, dir);
+    await calculateChecksumOfFileList(commandExecutionId, fileList);
+    await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
-    // await finishCommandExecution(commandExecutionId, 'failure');
+    if (commandExecutionId) {
+      await finishCommandExecution(commandExecutionId, 'failure');
+    }
     throw err;
-  } finally {
-    // Close the database connection
-    // closeConnection();
   }
+  shutDown();
+  process.exit(0);
 }
 
 run();

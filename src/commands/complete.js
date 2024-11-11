@@ -1,10 +1,15 @@
 const { consoleLogError, consoleLog } = require('../lib/loggers');
-const { getFileList, getFileNameDuplicates } = require('../lib/file-management');
+const {
+  getFileList,
+  getFileNameDuplicates,
+  hasDirAccess,
+} = require('../lib/file-management');
 const { finishCommandExecution, getDir } = require('../models/commandExecutions');
 const {
   calculateChecksumOfFileList,
   getFilePathByCommandId,
 } = require('../models/checksum');
+const { shutDown } = require('../lib/shut-down');
 
 function receiveArguments() {
   const commandExecutionId = Number(process.argv[2]);
@@ -19,6 +24,10 @@ function receiveArguments() {
 async function run() {
   const commandExecutionId = receiveArguments();
   const dir = await getDir(commandExecutionId);
+  if (!hasDirAccess(dir)) {
+    consoleLogError('There are no access to dir: ' + dir);
+    process.exit(1);
+  }
   const fileList = await getFileList(dir);
   const duplicates = await getFileNameDuplicates(fileList);
 
@@ -36,14 +45,17 @@ async function run() {
     consoleLog(`Found ${fileListArray.length} files in ${dir}`);
     consoleLog(`Found ${dbFiles.length} files in the database`);
     consoleLog(`There are ${filesToComplete.length} files to complete`);
-    await calculateChecksumOfFileList(commandExecutionId, filesToComplete, dir);
+    await calculateChecksumOfFileList(commandExecutionId, filesToComplete);
+    await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
-    await finishCommandExecution(commandExecutionId, 'failure');
+    if (commandExecutionId) {
+      await finishCommandExecution(commandExecutionId, 'failure');
+    }
+    shutDown();
     throw err;
-  } finally {
-    // Close the database connection
-    // closeConnection();
   }
+  shutDown();
+  process.exit(0);
 }
 
 run();
