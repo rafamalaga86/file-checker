@@ -3,6 +3,11 @@ function consoleLogError(message) {
   const reset = '\x1b[0m';
   console.error(red + message + reset);
 }
+function consoleLogSuccess(message) {
+  const green = '\x1b[32m';
+  const reset = '\x1b[0m';
+  console.error(green + message + reset);
+}
 
 function consoleLog(...message) {
   console.log(...message);
@@ -36,13 +41,16 @@ function printGreen(message) {
   const green = '\x1b[32m';
   print(message, green);
 }
-function eol() {
-  print('\n');
+function eol(iterations = 1) {
+  for (let i = 0; i < iterations; i++) {
+    print('\n');
+  }
 }
 
 module.exports = {
   consoleLog,
   consoleLogError,
+  consoleLogSuccess,
   printYellow,
   printRed,
   printBlue,

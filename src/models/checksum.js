@@ -72,6 +72,17 @@ async function getFilePathByCommandId(commandExecutionId) {
 
   return result.map(item => item.file_path);
 }
+async function getAllByCommandId(commandExecutionId) {
+  const connection = await getDbConnection();
+
+  // Insert checksum data into the database
+  const [result] = await connection.execute(
+    'SELECT * FROM checksums WHERE command_execution_id = ?',
+    [commandExecutionId]
+  );
+
+  return result;
+}
 
 async function getFailedByCommandId(commandExecutionId) {
   const connection = await getDbConnection();
@@ -125,6 +136,23 @@ async function deleteByCommandId(commandExecutionId) {
   }
 }
 
+async function replaceLocations(fileListWithReplacements) {
+  const ids = fileListWithReplacements.map(obj => obj.id);
+  const cases = fileListWithReplacements
+    .map(obj => `WHEN id = ${obj.id} THEN '${obj.newFilePath}'`)
+    .join(' ');
+
+  const connection = await getDbConnection();
+  const [result] = await connection.execute(`
+  UPDATE checksums
+  SET file_path = CASE 
+    ${cases}
+    END
+  WHERE id IN (${ids.join(',')});`);
+
+  return result;
+}
+
 async function calculateChecksumOfFileList(commandExecutionId, fileList) {
   if (fileList.length === 0) {
     return;
@@ -170,9 +198,11 @@ module.exports = {
   getById,
   getByCommandId,
   listProcesses,
+  replaceLocations,
   deleteByCommandId,
   calculateChecksumOfFileList,
   getByCommandId,
+  getAllByCommandId,
   getFailedByCommandId,
   deleteFailedByCommandId,
   getFilePathByCommandId,

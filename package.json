@@ -10,6 +10,7 @@
     "complete": "node ./src/commands/complete.js",
     "delete": "node ./src/commands/delete.js",
     "compare": "node ./src/commands/compare.js",
+    "update-locations": "node ./src/commands/update-locations.js",
     "create-tables": "node ./src/commands/create-tables.js"
   },
   "author": "Bard",

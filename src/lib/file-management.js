@@ -30,6 +30,12 @@ async function getFileList(currentDir) {
   return fileList;
 }
 
+async function searchFileNoCase(fileList, fileName) {
+  return Array.from(fileList).find(filePath =>
+    filePath.toLowerCase().includes(fileName.toLowerCase())
+  );
+}
+
 async function getFileNameDuplicates(fileList) {
   const files = Array.from(fileList).map(filePath => {
     return [filePath, getFileNameFromPath(filePath)];
@@ -81,4 +87,5 @@ module.exports = {
   getFileNameDuplicates,
   getFileNameFromPath,
   hasDirAccess,
+  searchFileNoCase,
 };
