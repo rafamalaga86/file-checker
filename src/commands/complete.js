@@ -10,6 +10,8 @@ const {
   getFilePathByCommandId,
 } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
+const { confirmOrAbort } = require('../lib/command-line');
+const { statusView } = require('../views/complete');
 
 function receiveArguments() {
   const commandExecutionId = Number(process.argv[2]);
@@ -42,9 +44,8 @@ async function run() {
     const fileListArray = Array.from(fileList);
     const filesToComplete = fileListArray.filter(item => !dbFiles.includes(item));
 
-    consoleLog(`Found ${fileListArray.length} files in ${dir}`);
-    consoleLog(`Found ${dbFiles.length} files in the database`);
-    consoleLog(`There are ${filesToComplete.length} files to complete`);
+    statusView(fileListArray.length, dir, dbFiles.length, filesToComplete.length);
+    await confirmOrAbort();
     await calculateChecksumOfFileList(commandExecutionId, filesToComplete);
     await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
