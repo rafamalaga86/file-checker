@@ -1,6 +1,4 @@
-const mysql = require('mysql2/promise');
 const readline = require('readline');
-const { config } = require('../config/config');
 const { closeConnection, getDbConnection } = require('../lib/db');
 const { consoleLogError, consoleLog } = require('../lib/loggers');
 
@@ -22,8 +20,6 @@ async function run() {
 }
 
 async function createTables() {
-  const dbConfig = config.dbConfig;
-  let connection;
   try {
     // Connect to the database
     const connection = await getDbConnection();

@@ -16,6 +16,7 @@ const { statusView } = require('../views/complete');
 async function run() {
   const commandExecutionId = receiveCommandExecutionId();
   const commandExists = await exists(commandExecutionId);
+
   if (!commandExists) {
     consoleLogError('That command execution id does not exists');
     process.exit(1);
@@ -26,6 +27,7 @@ async function run() {
     consoleLogError('There are no access to dir: ' + dir);
     process.exit(1);
   }
+
   const fileList = await getFileList(dir);
   const duplicates = await getFileNameDuplicates(fileList);
 

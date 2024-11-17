@@ -113,24 +113,21 @@ async function deleteByCommandId(commandExecutionId) {
   await connection.beginTransaction();
 
   try {
-    // Eliminar de la tabla checksums
     const [queryResult1] = await connection.execute(
       `DELETE FROM checksums WHERE command_execution_id = ?`,
       [commandExecutionId]
     );
 
-    // Eliminar de la tabla command_executions
     const [queryResult2] = await connection.execute(
       `DELETE FROM command_executions WHERE ID = ?`,
       [commandExecutionId]
     );
 
-    // Si ambas queries se ejecutaron correctamente, hacer commit de la transacción
     await connection.commit();
 
     return { queryResult1, queryResult2 };
   } catch (error) {
-    // Si algo falla, revertir la transacción
+    // If something fails, roll back
     await connection.rollback();
     throw error;
   }

@@ -2,7 +2,7 @@ const { deleteByCommandId } = require('../models/checksum');
 const { consoleLog } = require('../lib/loggers');
 const { receiveCommandExecutionId } = require('../lib/command-line');
 
-async function main() {
+async function run() {
   let commandExecutionId = receiveCommandExecutionId();
   const commandExists = await exists(commandExecutionId);
   if (!commandExists) {
@@ -16,4 +16,4 @@ async function main() {
   process.exit(0);
 }
 
-main();
+run();

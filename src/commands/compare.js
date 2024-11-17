@@ -20,7 +20,7 @@ function receiveArguments() {
   return { id1, id2 };
 }
 
-async function main() {
+async function run() {
   let { id1, id2 } = receiveArguments();
 
   const command1Exists = await exists(id1);
@@ -88,4 +88,4 @@ async function main() {
   process.exit(0);
 }
 
-main();
+run();
