@@ -11,19 +11,15 @@ const { getDir } = require('../models/commandExecutions');
 const { hasDirAccess, getFileList, searchFileNoCase } = require('../lib/file-management');
 const { getAllByCommandId, replaceLocations } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
-
-function receiveArguments() {
-  const id = process.argv[2];
-
-  if (!id) {
-    consoleLogError('Error: Please provide a command execution ID.');
-    process.exit(1);
-  }
-  return id;
-}
+const { receiveCommandExecutionId } = require('../lib/command-line');
 
 async function run() {
-  let commandExecutionId = receiveArguments();
+  let commandExecutionId = receiveCommandExecutionId();
+  const commandExists = await exists(commandExecutionId);
+  if (!commandExists) {
+    consoleLogError('That command execution id does not exists');
+    process.exit(1);
+  }
 
   const dir = await getDir(commandExecutionId);
   if (!hasDirAccess(dir)) {

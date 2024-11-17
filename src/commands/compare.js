@@ -1,23 +1,38 @@
 const { getByCommandId } = require('../models/checksum');
-const { consoleLog } = require('../lib/loggers');
 const {
   printYellow,
   printGreen,
-  printBlue,
-  printRed,
+  consoleLogError,
   eol,
   print,
 } = require('../lib/loggers');
+const { exists } = require('../models/commandExecutions');
 
 function receiveArguments() {
   const id1 = process.argv[2];
   const id2 = process.argv[3];
+
+  if (!id1 || !id2) {
+    consoleLogError('Error: Please provide TWO command execution ID.');
+    process.exit(1);
+  }
 
   return { id1, id2 };
 }
 
 async function main() {
   let { id1, id2 } = receiveArguments();
+
+  const command1Exists = await exists(id1);
+  if (!command1Exists) {
+    consoleLogError('The FIRST command execution id does not exists');
+    process.exit(1);
+  }
+  const command2Exists = await exists(id2);
+  if (!command2Exists) {
+    consoleLogError('The SECOND command execution id does not exists');
+    process.exit(1);
+  }
 
   const process1 = await getByCommandId(id1);
   const process2 = await getByCommandId(id2);

@@ -1,3 +1,5 @@
+const { consoleLogError } = require('./loggers');
+
 const readline = require('readline').createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -19,4 +21,20 @@ async function confirmOrAbort() {
   });
 }
 
-module.exports = { confirmOrAbort };
+function receiveCommandExecutionId() {
+  const argument = process.argv[2];
+
+  if (!argument) {
+    consoleLogError('Error: Please provide a command execution ID as a parameter');
+    process.exit(1);
+  }
+  const commandExecutionId = Number(argument);
+
+  if (isNaN(commandExecutionId) || commandExecutionId < 1) {
+    consoleLogError('Error: The parameter should be a valid command execution id');
+    process.exit(1);
+  }
+  return commandExecutionId;
+}
+
+module.exports = { confirmOrAbort, receiveCommandExecutionId };

@@ -1,5 +1,5 @@
 const { consoleLogError, consoleLog } = require('../lib/loggers');
-const { finishCommandExecution, getDir } = require('../models/commandExecutions');
+const { finishCommandExecution, getDir, exists } = require('../models/commandExecutions');
 const { hasDirAccess } = require('../lib/file-management');
 const {
   deleteFailedByCommandId,
@@ -7,19 +7,15 @@ const {
   calculateChecksumOfFileList,
 } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
-
-function receiveArguments() {
-  const id = process.argv[2];
-
-  if (!id) {
-    consoleLogError('Error: Please provide a command execution ID.');
-    process.exit(1);
-  }
-  return id;
-}
+const { receiveCommandExecutionId } = require('../lib/command-line');
 
 async function run() {
-  let commandExecutionId = receiveArguments();
+  let commandExecutionId = receiveCommandExecutionId();
+  const commandExists = await exists(commandExecutionId);
+  if (!commandExists) {
+    consoleLogError('That command execution id does not exists');
+    process.exit(1);
+  }
 
   try {
     const failed = await getFailedByCommandId(commandExecutionId);

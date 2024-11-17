@@ -4,27 +4,23 @@ const {
   getFileNameDuplicates,
   hasDirAccess,
 } = require('../lib/file-management');
-const { finishCommandExecution, getDir } = require('../models/commandExecutions');
+const { finishCommandExecution, getDir, exists } = require('../models/commandExecutions');
 const {
   calculateChecksumOfFileList,
   getFilePathByCommandId,
 } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
-const { confirmOrAbort } = require('../lib/command-line');
+const { confirmOrAbort, receiveCommandExecutionId } = require('../lib/command-line');
 const { statusView } = require('../views/complete');
 
-function receiveArguments() {
-  const commandExecutionId = Number(process.argv[2]);
-
-  if (isNaN(commandExecutionId) || commandExecutionId < 1) {
-    consoleLogError('You should pass a parameter of a valid command execution id');
+async function run() {
+  const commandExecutionId = receiveCommandExecutionId();
+  const commandExists = await exists(commandExecutionId);
+  if (!commandExists) {
+    consoleLogError('That command execution id does not exists');
     process.exit(1);
   }
-  return commandExecutionId;
-}
 
-async function run() {
-  const commandExecutionId = receiveArguments();
   const dir = await getDir(commandExecutionId);
   if (!hasDirAccess(dir)) {
     consoleLogError('There are no access to dir: ' + dir);

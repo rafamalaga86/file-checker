@@ -1,17 +1,14 @@
 const { deleteByCommandId } = require('../models/checksum');
 const { consoleLog } = require('../lib/loggers');
-
-function receiveArguments() {
-  const id = process.argv[2];
-  if (!id) {
-    consoleLog('You need to pass an argument of the command execution id.');
-    process.exit(1);
-  }
-  return id;
-}
+const { receiveCommandExecutionId } = require('../lib/command-line');
 
 async function main() {
-  const id = receiveArguments();
+  let commandExecutionId = receiveCommandExecutionId();
+  const commandExists = await exists(commandExecutionId);
+  if (!commandExists) {
+    consoleLogError('That command execution id does not exists');
+    process.exit(1);
+  }
   const { queryResult1, queryResult2 } = await deleteByCommandId(id);
   consoleLog(`Rows of checksum deleted: ${queryResult1.affectedRows}`);
   consoleLog(`Rows of command execution deleted: ${queryResult2.affectedRows}`);

@@ -30,4 +30,13 @@ async function getDir(commandExecutionId) {
   return result[0].dir;
 }
 
-module.exports = { startCommandExecution, finishCommandExecution, getDir };
+async function exists(commandExecutionId) {
+  const connection = await getDbConnection();
+  const [result] = await connection.execute(
+    'SELECT * FROM command_executions WHERE id = ?',
+    [commandExecutionId]
+  );
+  return !!result.length;
+}
+
+module.exports = { startCommandExecution, finishCommandExecution, getDir, exists };
