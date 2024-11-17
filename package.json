@@ -6,6 +6,7 @@
   "scripts": {
     "check": "node ./src/commands/check.js",
     "list": "node ./src/commands/list.js",
+    "status": "node ./src/commands/status.js",
     "retry": "node ./src/commands/retry.js",
     "complete": "node ./src/commands/complete.js",
     "delete": "node ./src/commands/delete.js",

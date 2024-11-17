@@ -48,6 +48,21 @@ async function listProcesses() {
 
   return result;
 }
+async function getProcessesWithoutChecksums() {
+  const connection = await getDbConnection();
+
+  // Insert checksum data into the database
+  const [result] = await connection.execute(
+    `SELECT ce.id
+    FROM command_executions ce
+    LEFT JOIN checksums c ON ce.id = c.command_execution_id
+    WHERE c.command_execution_id IS NULL
+    ORDER BY command_execution_id
+    ;`
+  );
+
+  return result;
+}
 
 async function getByCommandId(commandExecutionId) {
   const connection = await getDbConnection();
@@ -91,6 +106,17 @@ async function getFailedByCommandId(commandExecutionId) {
   const [result] = await connection.execute(
     "SELECT file_path FROM checksums WHERE command_execution_id = ? AND checksum = ''",
     [commandExecutionId]
+  );
+
+  return result;
+}
+
+async function getAllFailed() {
+  const connection = await getDbConnection();
+
+  // Insert checksum data into the database
+  const [result] = await connection.execute(
+    "SELECT command_execution_id, count(*) as failed_number FROM checksums WHERE checksum = '' GROUP BY (command_execution_id);"
   );
 
   return result;
@@ -203,4 +229,6 @@ module.exports = {
   getFailedByCommandId,
   deleteFailedByCommandId,
   getFilePathByCommandId,
+  getProcessesWithoutChecksums,
+  getAllFailed,
 };
