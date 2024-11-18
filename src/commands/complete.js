@@ -46,7 +46,6 @@ async function run() {
     const fileListArray = Array.from(fileList);
     const filesToComplete = fileListArray.filter(item => !dbFiles.includes(item));
     const extraFiles = dbFiles.filter(item => !fileListArray.includes(item));
-    const duplicates = dbFiles.filter((item, index) => dbFiles.indexOf(item) !== index);
 
     statusView(
       fileListArray.length,

@@ -1,22 +1,24 @@
-const readline = require('readline');
 const { closeConnection, getDbConnection } = require('../lib/db');
-const { consoleLogError, consoleLog } = require('../lib/loggers');
+const {
+  consoleLogError,
+  consoleLog,
+  print,
+  printYellow,
+  eol,
+} = require('../lib/loggers');
+const { ynQuestion } = require('../lib/command-line');
+const { config } = require('../config/config');
 
 async function run() {
-  const readlineInterface = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+  print('This will drop all tables in the database ');
+  printYellow(config.dbConfig.database);
+  print(' and create them again');
+  eol();
+  const response = await ynQuestion('Are you sure?');
 
-  await readlineInterface.question(
-    'This will drop existing tables and create them again. Are you sure? (y/n): ',
-    response => {
-      if (response.toLowerCase() === 'y') {
-        createTables();
-      }
-      readlineInterface.close();
-    }
-  );
+  if (response) {
+    createTables();
+  }
 }
 
 async function createTables() {
@@ -49,6 +51,7 @@ async function createTables() {
         checksum VARCHAR(255) NOT NULL,
         stdout TEXT,
         stderr TEXT,
+        CONSTRAINT uc_command_execution_filepath UNIQUE (command_execution_id, file_path),
         FOREIGN KEY (command_execution_id) REFERENCES command_executions(id)
       );
     `);
