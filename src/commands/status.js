@@ -1,10 +1,4 @@
-const {
-  consoleLogSuccess,
-  print,
-  printYellow,
-  eol,
-  consoleLog,
-} = require('../lib/loggers');
+const { print, printYellow, eol, consoleLog } = require('../lib/loggers');
 const { getProcessesWithoutChecksums, getAllFailed } = require('../models/checksum');
 
 async function run() {

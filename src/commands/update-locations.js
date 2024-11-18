@@ -7,7 +7,7 @@ const {
   printGreen,
   eol,
 } = require('../lib/loggers');
-const { getDir } = require('../models/commandExecutions');
+const { getDir, exists } = require('../models/commandExecutions');
 const { hasDirAccess, getFileList, searchFileNoCase } = require('../lib/file-management');
 const { getAllByCommandId, replaceLocations } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');

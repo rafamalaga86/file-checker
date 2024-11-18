@@ -1,6 +1,6 @@
 const { print, eol, printGreen, printRed, consoleLogSuccess } = require('../lib/loggers');
 
-function statusView(fileNumber, dir, dbFilesNumber, remainingFiles) {
+function statusView(fileNumber, dir, dbFilesNumber, remainingFiles, extraFilesNumber) {
   print('Found ');
   printGreen(fileNumber);
   print(' files in ');
@@ -12,13 +12,20 @@ function statusView(fileNumber, dir, dbFilesNumber, remainingFiles) {
   eol();
 
   if (remainingFiles === 0) {
-    consoleLogSuccess('File list is up to date');
-    return;
+    consoleLogSuccess('All files in the dir are in the DB');
+  } else {
+    print('There are ');
+    printRed(remainingFiles);
+    print(' files to complete');
+    eol();
   }
-  print('There are ');
-  printRed(remainingFiles);
-  print(' files to complete');
-  eol();
+
+  if (extraFilesNumber) {
+    print('There are ');
+    printRed(extraFilesNumber);
+    print(' files in the DB that cannot be found in the directory');
+    eol();
+  }
 }
 
 module.exports = { statusView };

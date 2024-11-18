@@ -7,7 +7,7 @@ const readline = require('readline').createInterface({
 
 async function confirmOrAbort() {
   await new Promise(resolve => {
-    readline.question('\nDo you wish to continue? (y/n) ', response => {
+    readline.question(`\nDo you wish to continue? (y/n) `, response => {
       response = response.toLowerCase();
       if (response === 'y' || response === 'yes') {
         readline.close();
@@ -17,6 +17,16 @@ async function confirmOrAbort() {
         readline.close();
         process.exit(0);
       }
+    });
+  });
+}
+
+async function ynQuestion(question) {
+  return await new Promise(resolve => {
+    readline.question(`\n${question} (y/n) `, response => {
+      readline.close();
+      response = response.toLowerCase();
+      resolve(response === 'y' || response === 'yes');
     });
   });
 }
@@ -37,4 +47,4 @@ function receiveCommandExecutionId() {
   return commandExecutionId;
 }
 
-module.exports = { confirmOrAbort, receiveCommandExecutionId };
+module.exports = { confirmOrAbort, receiveCommandExecutionId, ynQuestion };

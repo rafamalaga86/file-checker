@@ -22,6 +22,12 @@ function print(message, color) {
   process.stdout.write(message);
 }
 
+function printArray(array) {
+  for (const string of array) {
+    console.log(string);
+  }
+}
+
 function printYellow(message) {
   const yellow = '\x1b[33m';
   print(message, yellow);
@@ -56,5 +62,6 @@ module.exports = {
   printBlue,
   printGreen,
   print,
+  printArray,
   eol,
 };

@@ -1,4 +1,4 @@
-const { consoleLogError, consoleLog } = require('../lib/loggers');
+const { consoleLogError, consoleLog, printArray } = require('../lib/loggers');
 const {
   getFileList,
   getFileNameDuplicates,
@@ -10,7 +10,11 @@ const {
   getFilePathByCommandId,
 } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
-const { confirmOrAbort, receiveCommandExecutionId } = require('../lib/command-line');
+const {
+  confirmOrAbort,
+  receiveCommandExecutionId,
+  ynQuestion,
+} = require('../lib/command-line');
 const { statusView } = require('../views/complete');
 
 async function run() {
@@ -41,11 +45,29 @@ async function run() {
     const dbFiles = await getFilePathByCommandId(commandExecutionId);
     const fileListArray = Array.from(fileList);
     const filesToComplete = fileListArray.filter(item => !dbFiles.includes(item));
+    const extraFiles = dbFiles.filter(item => !fileListArray.includes(item));
+    const duplicates = dbFiles.filter((item, index) => dbFiles.indexOf(item) !== index);
 
-    statusView(fileListArray.length, dir, dbFiles.length, filesToComplete.length);
-    await confirmOrAbort();
-    await calculateChecksumOfFileList(commandExecutionId, filesToComplete);
-    await finishCommandExecution(commandExecutionId, 'success');
+    statusView(
+      fileListArray.length,
+      dir,
+      dbFiles.length,
+      filesToComplete.length,
+      extraFiles.length
+    );
+
+    if (extraFiles.length) {
+      const seeThem = await ynQuestion('Want to see the files?');
+      if (seeThem) {
+        printArray(extraFiles);
+      }
+    }
+
+    if (filesToComplete.length > 0) {
+      await confirmOrAbort();
+      await calculateChecksumOfFileList(commandExecutionId, filesToComplete);
+      await finishCommandExecution(commandExecutionId, 'success');
+    }
   } catch (err) {
     if (commandExecutionId) {
       await finishCommandExecution(commandExecutionId, 'failure');
