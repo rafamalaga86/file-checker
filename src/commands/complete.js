@@ -4,10 +4,16 @@ const {
   getFileNameDuplicates,
   hasDirAccess,
 } = require('../lib/file-management');
-const { finishCommandExecution, getDir, exists } = require('../models/commandExecutions');
+const {
+  finishCommandExecution,
+  getDir,
+  exists,
+  markStatus,
+} = require('../models/commandExecutions');
 const {
   calculateChecksumOfFileList,
   getFilePathByCommandId,
+  countFailedByCommandId,
 } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
 const {
@@ -60,6 +66,12 @@ async function run() {
       if (seeThem) {
         printArray(extraFiles);
       }
+    }
+
+    // If all completed and no failed checksum, mark as success
+    const failedNumber = await countFailedByCommandId(commandExecutionId);
+    if (filesToComplete.length === 0 && failedNumber === 0) {
+      await markStatus(commandExecutionId, 'success');
     }
 
     if (filesToComplete.length > 0) {

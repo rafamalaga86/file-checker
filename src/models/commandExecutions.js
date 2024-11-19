@@ -21,6 +21,17 @@ async function finishCommandExecution(commandExecutionId, status) {
   );
 }
 
+async function markStatus(commandExecutionId, status) {
+  const connection = await getDbConnection();
+
+  const [result] = await connection.execute(
+    'UPDATE command_executions SET status = ? WHERE id = ?',
+    [status, commandExecutionId]
+  );
+
+  return !!result.changedRows;
+}
+
 async function getDir(commandExecutionId) {
   const connection = await getDbConnection();
   const [result] = await connection.execute(
@@ -39,4 +50,10 @@ async function exists(commandExecutionId) {
   return !!result.length;
 }
 
-module.exports = { startCommandExecution, finishCommandExecution, getDir, exists };
+module.exports = {
+  startCommandExecution,
+  finishCommandExecution,
+  getDir,
+  exists,
+  markStatus,
+};

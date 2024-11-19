@@ -111,6 +111,18 @@ async function getFailedByCommandId(commandExecutionId) {
   return result;
 }
 
+async function countFailedByCommandId(commandExecutionId) {
+  const connection = await getDbConnection();
+
+  // Insert checksum data into the database
+  const [result] = await connection.execute(
+    "SELECT count(file_path) as amount FROM checksums WHERE command_execution_id = ? AND checksum = ''",
+    [commandExecutionId]
+  );
+
+  return result[0].amount;
+}
+
 async function getAllFailed() {
   const connection = await getDbConnection();
 
@@ -227,6 +239,7 @@ module.exports = {
   getByCommandId,
   getAllByCommandId,
   getFailedByCommandId,
+  countFailedByCommandId,
   deleteFailedByCommandId,
   getFilePathByCommandId,
   getProcessesWithoutChecksums,
