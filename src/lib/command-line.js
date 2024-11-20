@@ -5,6 +5,12 @@ const readline = require('readline').createInterface({
   output: process.stdout,
 });
 
+function clearLastLine() {
+  // process.stdout.clearLine();
+  // process.stdout.cursorTo(0);
+  process.stdout.write('\r\x1b[K');
+}
+
 async function confirmOrAbort() {
   await new Promise(resolve => {
     readline.question(`\nDo you wish to continue? (y/n) `, response => {
@@ -47,4 +53,4 @@ function receiveCommandExecutionId() {
   return commandExecutionId;
 }
 
-module.exports = { confirmOrAbort, receiveCommandExecutionId, ynQuestion };
+module.exports = { confirmOrAbort, receiveCommandExecutionId, ynQuestion, clearLastLine };

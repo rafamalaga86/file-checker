@@ -44,7 +44,7 @@ async function run() {
     await calculateChecksumOfFileList(commandExecutionId, fileList);
     await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
-    if (commandExecutionId) {
+    if (typeof commandExecutionId !== 'undefined') {
       await finishCommandExecution(commandExecutionId, 'failure');
     }
     shutDown();

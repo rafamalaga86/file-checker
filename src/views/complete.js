@@ -1,4 +1,11 @@
-const { print, eol, printGreen, printRed, consoleLogSuccess } = require('../lib/loggers');
+const {
+  print,
+  eol,
+  printGreen,
+  printRed,
+  consoleLogSuccess,
+  printYellow,
+} = require('../lib/loggers');
 
 function statusView(fileNumber, dir, dbFilesNumber, remainingFiles, extraFilesNumber) {
   print('Found ');
@@ -15,7 +22,7 @@ function statusView(fileNumber, dir, dbFilesNumber, remainingFiles, extraFilesNu
     consoleLogSuccess('All files in the dir are in the DB');
   } else {
     print('There are ');
-    printRed(remainingFiles);
+    printYellow(remainingFiles);
     print(' files to complete');
     eol();
   }

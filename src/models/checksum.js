@@ -1,7 +1,8 @@
-const { consoleLogError, consoleLog, eol, print, printGreen } = require('../lib/loggers');
+const { consoleLogError, eol, print, printGreen } = require('../lib/loggers');
 const { getDbConnection } = require('../lib/db');
 const { getFileNameFromPath } = require('../lib/file-management');
 const { exec } = require('../lib/exec');
+const { ProgressBar } = require('../lib/bar');
 
 async function registerChecksum(
   filePath,
@@ -189,14 +190,19 @@ async function replaceLocations(fileListWithReplacements) {
 }
 
 async function calculateChecksumOfFileList(commandExecutionId, fileList) {
-  if (fileList.length === 0) {
+  if (fileList.size === 0) {
+    consoleLogError('The file list is empty');
     return;
   }
+
+  const bar = new ProgressBar(fileList.size);
+
   print('Launched command process with ID: ');
   printGreen(commandExecutionId);
   eol();
   eol();
 
+  let index = 0;
   for (const filePath of fileList) {
     const fileName = getFileNameFromPath(filePath);
     let checksum;
@@ -220,12 +226,21 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList) {
       stderrString
     );
 
+    // clearLastLine();
     print('ID: ');
     printGreen(id);
     print(' | ' + fileName + ' -> ');
     printGreen(checksum);
+
     eol();
+    // const percentage = index / fileList.size;
+    // Math.round(percentage * 10) * 10
+    bar.increment();
+    bar.print();
+    print(' ');
+    index++;
   }
+  // bar.stop();
 }
 
 module.exports = {
