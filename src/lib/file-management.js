@@ -27,17 +27,17 @@ async function getFileList(currentDir) {
     }
   }
   await getFileListRecursive(currentDir);
-  return fileList;
+  return Array.from(fileList);
 }
 
 async function searchFileNoCase(fileList, fileName) {
-  return Array.from(fileList).find(filePath =>
+  return fileList.find(filePath =>
     filePath.toLowerCase().includes(fileName.toLowerCase())
   );
 }
 
 async function getFileNameDuplicates(fileList) {
-  const files = Array.from(fileList).map(filePath => {
+  const files = fileList.map(filePath => {
     return [filePath, getFileNameFromPath(filePath)];
   });
 

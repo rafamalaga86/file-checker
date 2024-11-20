@@ -190,12 +190,12 @@ async function replaceLocations(fileListWithReplacements) {
 }
 
 async function calculateChecksumOfFileList(commandExecutionId, fileList) {
-  if (fileList.size === 0) {
+  if (fileList.length === 0) {
     consoleLogError('The file list is empty');
     return;
   }
 
-  const bar = new ProgressBar(fileList.size);
+  const bar = new ProgressBar(fileList.length);
 
   print('Launched command process with ID: ');
   printGreen(commandExecutionId);
@@ -233,7 +233,7 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList) {
     printGreen(checksum);
 
     eol();
-    // const percentage = index / fileList.size;
+    // const percentage = index / fileList.length;
     // Math.round(percentage * 10) * 10
     bar.increment();
     bar.print();

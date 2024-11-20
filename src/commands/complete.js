@@ -49,12 +49,11 @@ async function run() {
 
   try {
     const dbFiles = await getFilePathByCommandId(commandExecutionId);
-    const fileListArray = Array.from(fileList);
-    const filesToComplete = fileListArray.filter(item => !dbFiles.includes(item));
-    const extraFiles = dbFiles.filter(item => !fileListArray.includes(item));
+    const filesToComplete = fileList.filter(item => !dbFiles.includes(item));
+    const extraFiles = dbFiles.filter(item => !fileList.includes(item));
 
     statusView(
-      fileListArray.length,
+      fileList.length,
       dir,
       dbFiles.length,
       filesToComplete.length,
@@ -76,6 +75,7 @@ async function run() {
 
     if (filesToComplete.length > 0) {
       await confirmOrAbort();
+      await markStatus(commandExecutionId, 'running');
       await calculateChecksumOfFileList(commandExecutionId, filesToComplete);
       await finishCommandExecution(commandExecutionId, 'success');
     }

@@ -33,6 +33,9 @@ async function run() {
       consoleLogError('There are no access to dir: ' + dir);
       process.exit(1);
     }
+
+    await confirmOrAbort();
+    await markStatus(commandExecutionId, 'running');
     await deleteFailedByCommandId(commandExecutionId);
     await calculateChecksumOfFileList(commandExecutionId, fileList);
     await finishCommandExecution(commandExecutionId, 'success');
