@@ -22,6 +22,7 @@ const {
   ynQuestion,
 } = require('../lib/command-line');
 const { statusView } = require('../views/complete');
+const { ProgressBar } = require('../lib/bar');
 
 async function run() {
   const commandExecutionId = receiveCommandExecutionId();
@@ -76,7 +77,8 @@ async function run() {
     if (filesToComplete.length > 0) {
       await confirmOrAbort();
       await markStatus(commandExecutionId, 'running');
-      await calculateChecksumOfFileList(commandExecutionId, filesToComplete);
+      const bar = new ProgressBar(filesToComplete.length, dir, commandExecutionId);
+      await calculateChecksumOfFileList(commandExecutionId, filesToComplete, bar);
       await finishCommandExecution(commandExecutionId, 'success');
     }
   } catch (err) {

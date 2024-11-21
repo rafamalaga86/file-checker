@@ -2,7 +2,7 @@ const { consoleLogError, eol, print, printGreen } = require('../lib/loggers');
 const { getDbConnection } = require('../lib/db');
 const { getFileNameFromPath } = require('../lib/file-management');
 const { exec } = require('../lib/exec');
-const { ProgressBar } = require('../lib/bar');
+const { clearLastLine } = require('../lib/command-line');
 
 async function registerChecksum(
   filePath,
@@ -40,10 +40,11 @@ async function listProcesses() {
 
   // Insert checksum data into the database
   const [result] = await connection.execute(
-    `SELECT DISTINCT command_execution_id, dir, status, created_at, ended_at
-    FROM checksums
-    JOIN command_executions ON command_executions.id = checksums.command_execution_id
-    ORDER BY command_execution_id
+    `SELECT command_executions.id, dir, status, created_at, ended_at, count(checksums.id) AS checksum_count
+	  FROM checksums
+    RIGHT JOIN command_executions ON command_executions.id = checksums.command_execution_id
+    GROUP BY command_executions.id, dir, status, created_at, ended_at
+    ORDER BY command_executions.id
     ;`
   );
 
@@ -189,13 +190,11 @@ async function replaceLocations(fileListWithReplacements) {
   return result;
 }
 
-async function calculateChecksumOfFileList(commandExecutionId, fileList) {
+async function calculateChecksumOfFileList(commandExecutionId, fileList, bar) {
   if (fileList.length === 0) {
     consoleLogError('The file list is empty');
     return;
   }
-
-  const bar = new ProgressBar(fileList.length);
 
   print('Launched command process with ID: ');
   printGreen(commandExecutionId);
@@ -226,20 +225,18 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList) {
       stderrString
     );
 
-    // clearLastLine();
+    clearLastLine();
     print('ID: ');
     printGreen(id);
     print(' | ' + fileName + ' -> ');
     printGreen(checksum);
 
     eol();
-    // const percentage = index / fileList.length;
-    // Math.round(percentage * 10) * 10
     bar.increment();
     bar.print();
-    print(' ');
     index++;
   }
+  eol();
   // bar.stop();
 }
 

@@ -10,6 +10,7 @@ const {
 } = require('../models/commandExecutions');
 const { calculateChecksumOfFileList } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
+const { ProgressBar } = require('../lib/bar');
 
 function receiveArguments() {
   const dir = process.argv[2];
@@ -41,7 +42,8 @@ async function run() {
 
   try {
     const commandExecutionId = await startCommandExecution(dir);
-    await calculateChecksumOfFileList(commandExecutionId, fileList);
+    const bar = new ProgressBar(fileList.length, dir, commandExecutionId);
+    await calculateChecksumOfFileList(commandExecutionId, fileList, bar);
     await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
     if (typeof commandExecutionId !== 'undefined') {

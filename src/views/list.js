@@ -12,16 +12,22 @@ function printList(rows) {
     item1.finalDir.localeCompare(item2.finalDir)
   );
   for (const checksum of sortedRows) {
-    printYellow(checksum.command_execution_id.toString() + ' ');
+    printYellow(checksum.id + ' ');
     printRed(checksum.finalDir + ' ');
-    printGreen(checksum.dir + ' ');
-    print(checksum.status + ' ');
-    printBlue(checksum.created_at.toISOString() + ' ');
+    print(checksum.dir + ' ');
+    printGreen(checksum.status + ' ');
+    print(checksum.checksum_count.toString() + ' checksums');
 
-    if (checksum.ended_at) {
-      process.stdout.write(' ');
-      process.stdout.write(checksum.ended_at.toISOString());
+    if (checksum.failed) {
+      printRed(' ' + checksum.failed + ' checksum errors');
     }
+
+    // printBlue(checksum.created_at.toISOString() + ' ');
+
+    // if (checksum.ended_at) {
+    //   process.stdout.write(' ');
+    //   process.stdout.write(checksum.ended_at.toISOString());
+    // }
     eol();
   }
 }

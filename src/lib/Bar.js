@@ -1,11 +1,15 @@
-const { eol } = require('./loggers');
+const { print, printGreen, printYellow } = require('./loggers');
 
 class ProgressBar {
-  constructor(max) {
+  constructor(max, dir, executionId) {
+    this.#dir = dir;
+    this.#executionId = executionId;
     this.#max = max;
     this.#unit = 0;
   }
 
+  #dir;
+  #executionId;
   #max;
   #unit;
 
@@ -14,7 +18,10 @@ class ProgressBar {
   }
 
   print() {
-    process.stdout.write(`${this.#getPercentage()}%`);
+    printGreen(`${this.#getPercentage()}%`);
+    printYellow(` ${this.#dir}`);
+    print(' Execution ID: ');
+    printGreen(`${this.#executionId}`);
   }
 
   increment() {

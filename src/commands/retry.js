@@ -1,5 +1,10 @@
 const { consoleLogError, consoleLog } = require('../lib/loggers');
-const { finishCommandExecution, getDir, exists } = require('../models/commandExecutions');
+const {
+  finishCommandExecution,
+  getDir,
+  exists,
+  markStatus,
+} = require('../models/commandExecutions');
 const { hasDirAccess } = require('../lib/file-management');
 const {
   deleteFailedByCommandId,
@@ -7,7 +12,8 @@ const {
   calculateChecksumOfFileList,
 } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
-const { receiveCommandExecutionId } = require('../lib/command-line');
+const { receiveCommandExecutionId, confirmOrAbort } = require('../lib/command-line');
+const { ProgressBar } = require('../lib/bar');
 
 async function run() {
   let commandExecutionId = receiveCommandExecutionId();
@@ -37,7 +43,8 @@ async function run() {
     await confirmOrAbort();
     await markStatus(commandExecutionId, 'running');
     await deleteFailedByCommandId(commandExecutionId);
-    await calculateChecksumOfFileList(commandExecutionId, fileList);
+    const bar = new ProgressBar(filesToComplete.length, dir, commandExecutionId);
+    await calculateChecksumOfFileList(commandExecutionId, fileList, bar);
     await finishCommandExecution(commandExecutionId, 'success');
   } catch (err) {
     if (commandExecutionId) {

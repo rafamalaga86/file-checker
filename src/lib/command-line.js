@@ -13,7 +13,7 @@ function clearLastLine() {
 
 async function confirmOrAbort() {
   await new Promise(resolve => {
-    readline.question(`\nDo you wish to continue? (y/n) `, response => {
+    readline.question(`\nDo you wish to continue?(y/n): `, response => {
       response = response.toLowerCase();
       if (response === 'y' || response === 'yes') {
         readline.close();
