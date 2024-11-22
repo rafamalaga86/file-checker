@@ -29,7 +29,7 @@ async function confirmOrAbort() {
 
 async function ynQuestion(question) {
   return await new Promise(resolve => {
-    readline.question(`\n${question} (y/n) `, response => {
+    readline.question(`\n${question}(y/n) `, response => {
       readline.close();
       response = response.toLowerCase();
       resolve(response === 'y' || response === 'yes');

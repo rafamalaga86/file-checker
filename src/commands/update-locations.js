@@ -9,9 +9,13 @@ const {
 } = require('../lib/loggers');
 const { getDir, exists } = require('../models/commandExecutions');
 const { hasDirAccess, getFileList, searchFileNoCase } = require('../lib/file-management');
-const { getAllByCommandId, replaceLocations } = require('../models/checksum');
+const {
+  getAllByCommandId,
+  replaceLocations,
+  deleteByIds,
+} = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
-const { receiveCommandExecutionId } = require('../lib/command-line');
+const { receiveCommandExecutionId, ynQuestion } = require('../lib/command-line');
 
 async function run() {
   let commandExecutionId = receiveCommandExecutionId();
@@ -35,6 +39,7 @@ async function run() {
   }
 
   const fileListWithReplacements = [];
+  const fileListNotFound = [];
   const fileList = await getFileList(dir);
   for (const checksum of checksums) {
     if (!hasDirAccess(checksum.file_path)) {
@@ -44,17 +49,19 @@ async function run() {
 
       const newLocation = await searchFileNoCase(fileList, checksum.file);
 
+      if (!newLocation) {
+        fileListNotFound.push({ id: checksum.id });
+        printRed('New Location Not Found');
+        eol(2);
+        continue;
+      }
+
       fileListWithReplacements.push({
         id: checksum.id,
         filePath: checksum.file_path,
         newFilePath: newLocation,
       });
 
-      if (!newLocation) {
-        printRed(' New Location Not Found');
-        eol(2);
-        continue;
-      }
       print('New Location: ');
       printGreen(newLocation);
       eol(2);
@@ -63,12 +70,23 @@ async function run() {
 
   if (fileListWithReplacements.length < 1) {
     consoleLogSuccess('No file locations to replace...');
-    process.exit(1);
+    eol();
+  } else {
+    const result = await replaceLocations(fileListWithReplacements);
+    consoleLog(result.info);
   }
 
-  const result = await replaceLocations(fileListWithReplacements);
-  consoleLog(result.info);
-
+  if (fileListNotFound.length > 0) {
+    consoleLog(
+      `There are ${fileListNotFound.length} files that are not found in the dir.`
+    );
+    const ids = fileListNotFound.map(item => item.id);
+    const shouldDelete = await ynQuestion('Want to delete them from the DB?');
+    if (shouldDelete) {
+      const result = await deleteByIds(ids);
+      consoleLog(`Rows of checksum deleted: ${result.affectedRows}`);
+    }
+  }
   shutDown();
   process.exit(0);
 }

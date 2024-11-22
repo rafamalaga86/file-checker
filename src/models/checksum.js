@@ -147,6 +147,20 @@ async function deleteFailedByCommandId(commandExecutionId) {
   return result;
 }
 
+async function deleteByIds(ids) {
+  if (typeof ids === 'number') {
+    ids = [ids];
+  }
+  ids = ids.join(',');
+  const connection = await getDbConnection();
+
+  const [result] = await connection.execute('DELETE FROM checksums WHERE id IN (?)', [
+    ids,
+  ]);
+
+  return result;
+}
+
 async function deleteByCommandId(commandExecutionId) {
   const connection = await getDbConnection();
 
@@ -213,10 +227,6 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, bar) {
     const stdout = stdoutString.split('  ');
     checksum = stdout[0];
 
-    if (stderrString) {
-      consoleLogError(`Error calculating checksum for ${filePath}:`, stderrString);
-    }
-
     const id = await registerChecksum(
       filePath,
       checksum,
@@ -229,6 +239,9 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, bar) {
     print('ID: ');
     printGreen(id);
     print(' | ' + fileName + ' -> ');
+    if (stderrString) {
+      consoleLogError(`Error calculating checksum. `, stderrString);
+    }
     printGreen(checksum);
 
     eol();
@@ -247,6 +260,7 @@ module.exports = {
   listProcesses,
   replaceLocations,
   deleteByCommandId,
+  deleteByIds,
   calculateChecksumOfFileList,
   getByCommandId,
   getAllByCommandId,
