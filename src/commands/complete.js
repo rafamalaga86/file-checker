@@ -53,13 +53,14 @@ async function run() {
     const dbFiles = await getFilePathByCommandId(commandExecutionId);
     const filesToComplete = fileList.filter(item => !dbFiles.includes(item));
     const extraFiles = dbFiles.filter(item => !fileList.includes(item));
-
+    const failedNumber = await countFailedByCommandId(commandExecutionId);
     statusView(
       fileList.length,
       dir,
       dbFiles.length,
       filesToComplete.length,
-      extraFiles.length
+      extraFiles.length,
+      failedNumber
     );
 
     if (extraFiles.length) {
@@ -70,7 +71,6 @@ async function run() {
     }
 
     // If all completed and no failed checksum, mark as success
-    const failedNumber = await countFailedByCommandId(commandExecutionId);
     if (filesToComplete.length === 0 && failedNumber === 0) {
       await markStatus(commandExecutionId, status.SUCCESS);
     }

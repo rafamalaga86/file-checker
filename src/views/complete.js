@@ -7,7 +7,14 @@ const {
   printYellow,
 } = require('../lib/loggers');
 
-function statusView(fileNumber, dir, dbFilesNumber, remainingFiles, extraFilesNumber) {
+function statusView(
+  fileNumber,
+  dir,
+  dbFilesNumber,
+  remainingFiles,
+  extraFilesNumber,
+  failedNumber
+) {
   print('Found ');
   printGreen(fileNumber);
   print(' files in ');
@@ -24,6 +31,14 @@ function statusView(fileNumber, dir, dbFilesNumber, remainingFiles, extraFilesNu
     print('There are ');
     printYellow(remainingFiles);
     print(' files to complete');
+    eol();
+  }
+
+  if (failedNumber) {
+    eol();
+    print('There are ');
+    printRed(failedNumber);
+    print(' checksums failed and you should run a retry');
     eol();
   }
 
