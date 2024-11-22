@@ -1,3 +1,4 @@
+const { status } = require('../enums/status');
 const { getDbConnection } = require('../lib/db');
 
 async function startCommandExecution(dir) {
@@ -7,7 +8,7 @@ async function startCommandExecution(dir) {
 
   const [result] = await connection.execute(
     'INSERT INTO command_executions (created_at, status, dir) VALUES (?, ?, ?)',
-    [commandStartTime, 'running', dir]
+    [commandStartTime, status.RUNNING, dir]
   );
   return result.insertId; // Assign commandExecutionId here
 }

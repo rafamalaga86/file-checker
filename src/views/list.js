@@ -1,3 +1,4 @@
+const { status } = require('../enums/status');
 const {
   printYellow,
   printGreen,
@@ -15,7 +16,11 @@ function printList(rows) {
     printYellow(checksum.id + ' ');
     printRed(checksum.finalDir + ' ');
     print(checksum.dir + ' ');
-    printGreen(checksum.status + ' ');
+    let statusPrint = printGreen;
+    if (checksum.status !== status.SUCCESS) {
+      statusPrint = printYellow;
+    }
+    statusPrint(checksum.status + ' ');
     print(checksum.checksum_count.toString() + ' checksums');
 
     if (checksum.failed) {

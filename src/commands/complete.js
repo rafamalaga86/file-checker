@@ -23,6 +23,7 @@ const {
 } = require('../lib/command-line');
 const { statusView } = require('../views/complete');
 const { ProgressBar } = require('../lib/bar');
+const { status } = require('../enums/status');
 
 async function run() {
   const commandExecutionId = receiveCommandExecutionId();
@@ -71,19 +72,19 @@ async function run() {
     // If all completed and no failed checksum, mark as success
     const failedNumber = await countFailedByCommandId(commandExecutionId);
     if (filesToComplete.length === 0 && failedNumber === 0) {
-      await markStatus(commandExecutionId, 'success');
+      await markStatus(commandExecutionId, status.SUCCESS);
     }
 
     if (filesToComplete.length > 0) {
       await confirmOrAbort();
-      await markStatus(commandExecutionId, 'running');
+      await markStatus(commandExecutionId, status.RUNNING);
       const bar = new ProgressBar(filesToComplete.length, dir, commandExecutionId);
       await calculateChecksumOfFileList(commandExecutionId, filesToComplete, bar);
-      await finishCommandExecution(commandExecutionId, 'success');
+      await finishCommandExecution(commandExecutionId, status.SUCCESS);
     }
   } catch (err) {
     if (commandExecutionId) {
-      await finishCommandExecution(commandExecutionId, 'failure');
+      await finishCommandExecution(commandExecutionId, status.FAILURE);
     }
     shutDown();
     throw err;

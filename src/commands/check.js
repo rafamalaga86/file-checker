@@ -44,10 +44,10 @@ async function run() {
     const commandExecutionId = await startCommandExecution(dir);
     const bar = new ProgressBar(fileList.length, dir, commandExecutionId);
     await calculateChecksumOfFileList(commandExecutionId, fileList, bar);
-    await finishCommandExecution(commandExecutionId, 'success');
+    await finishCommandExecution(commandExecutionId, status.SUCCESS);
   } catch (err) {
     if (typeof commandExecutionId !== 'undefined') {
-      await finishCommandExecution(commandExecutionId, 'failure');
+      await finishCommandExecution(commandExecutionId, status.FAILURE);
     }
     shutDown();
     throw err;

@@ -14,6 +14,7 @@ const {
 const { shutDown } = require('../lib/shut-down');
 const { receiveCommandExecutionId, confirmOrAbort } = require('../lib/command-line');
 const { ProgressBar } = require('../lib/bar');
+const { status } = require('../enums/status');
 
 async function run() {
   let commandExecutionId = receiveCommandExecutionId();
@@ -41,14 +42,14 @@ async function run() {
     }
 
     await confirmOrAbort();
-    await markStatus(commandExecutionId, 'running');
+    await markStatus(commandExecutionId, status.RUNNING);
     await deleteFailedByCommandId(commandExecutionId);
-    const bar = new ProgressBar(filesToComplete.length, dir, commandExecutionId);
+    const bar = new ProgressBar(fileList.length, dir, commandExecutionId);
     await calculateChecksumOfFileList(commandExecutionId, fileList, bar);
-    await finishCommandExecution(commandExecutionId, 'success');
+    await finishCommandExecution(commandExecutionId, status.SUCCESS);
   } catch (err) {
     if (commandExecutionId) {
-      await finishCommandExecution(commandExecutionId, 'failure');
+      await finishCommandExecution(commandExecutionId, status.FAILURE);
     }
     throw err;
   }
