@@ -33,9 +33,24 @@ function printYellow(message) {
   print(message, yellow);
 }
 
+function printGray(message) {
+  const gray = '\x1b[90m';
+  print(message, gray);
+}
+
 function printRed(message) {
   const red = '\x1b[31m';
   print(message, red);
+}
+
+function printMagenta(message) {
+  const magenta = '\x1b[35m';
+  print(message, magenta);
+}
+
+function printCyan(message) {
+  const cyan = '\x1b[36m';
+  print(message, cyan);
 }
 
 function printBlue(message) {
@@ -59,6 +74,9 @@ module.exports = {
   consoleLogSuccess,
   printYellow,
   printRed,
+  printMagenta,
+  printGray,
+  printCyan,
   printBlue,
   printGreen,
   print,

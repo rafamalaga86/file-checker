@@ -21,6 +21,11 @@ async function run() {
     rows.push({ ...checksum, finalDir, failed: failed.length });
   }
 
+  if (rows.length === 0) {
+    consoleLog('No executions to show!');
+    process.exit(0);
+  }
+
   printList(rows);
   process.exit(0);
 }

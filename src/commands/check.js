@@ -42,6 +42,9 @@ async function run() {
 
   try {
     const commandExecutionId = await startCommandExecution(dir);
+    if (dir.endsWith('/')) {
+      dir = dir.slice(0, -1);
+    }
     const bar = new ProgressBar(fileList.length, dir, commandExecutionId);
     await calculateChecksumOfFileList(commandExecutionId, fileList, bar);
     await finishCommandExecution(commandExecutionId, status.SUCCESS);
