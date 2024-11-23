@@ -1,9 +1,11 @@
 const { consoleLogError } = require('./loggers');
 
-const readline = require('readline').createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+function createReadline() {
+  return require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+}
 
 function clearLastLine() {
   // process.stdout.clearLine();
@@ -13,6 +15,7 @@ function clearLastLine() {
 
 async function confirmOrAbort() {
   await new Promise(resolve => {
+    const readline = createReadline();
     readline.question(`\nDo you wish to continue?(y/n): `, response => {
       response = response.toLowerCase();
       if (response === 'y' || response === 'yes') {
@@ -29,6 +32,7 @@ async function confirmOrAbort() {
 
 async function ynQuestion(question) {
   return await new Promise(resolve => {
+    const readline = createReadline();
     readline.question(`\n${question}(y/n) `, response => {
       readline.close();
       response = response.toLowerCase();

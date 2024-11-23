@@ -154,9 +154,9 @@ async function deleteByIds(ids) {
   }
   const connection = await getDbConnection();
 
-  const [result] = await connection.execute('DELETE FROM checksums WHERE id IN (?)', [
-    ids,
-  ]);
+  const [result] = await connection.execute(
+    'DELETE FROM checksums WHERE id IN (' + ids.join(',') + ')'
+  );
 
   return result;
 }
