@@ -79,8 +79,12 @@ async function run() {
       await confirmOrAbort();
       await markStatus(commandExecutionId, status.RUNNING);
       const bar = new ProgressBar(filesToComplete.length, dir, commandExecutionId);
-      await calculateChecksumOfFileList(commandExecutionId, filesToComplete, bar);
-      await finishCommandExecution(commandExecutionId, status.SUCCESS);
+      const statusResult = await calculateChecksumOfFileList(
+        commandExecutionId,
+        filesToComplete,
+        bar
+      );
+      await finishCommandExecution(commandExecutionId, statusResult);
     }
   } catch (err) {
     if (commandExecutionId) {

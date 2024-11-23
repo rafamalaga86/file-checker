@@ -3,6 +3,7 @@ const { getDbConnection } = require('../lib/db');
 const { getFileNameFromPath } = require('../lib/file-management');
 const { exec } = require('../lib/exec');
 const { clearLastLine } = require('../lib/command-line');
+const { status } = require('../enums/status');
 
 async function registerChecksum(
   filePath,
@@ -151,7 +152,6 @@ async function deleteByIds(ids) {
   if (typeof ids === 'number') {
     ids = [ids];
   }
-  ids = ids.join(',');
   const connection = await getDbConnection();
 
   const [result] = await connection.execute('DELETE FROM checksums WHERE id IN (?)', [
@@ -205,6 +205,7 @@ async function replaceLocations(fileListWithReplacements) {
 }
 
 async function calculateChecksumOfFileList(commandExecutionId, fileList, bar) {
+  let result = status.SUCCESS;
   if (fileList.length === 0) {
     consoleLogError('The file list is empty');
     return;
@@ -241,6 +242,7 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, bar) {
     print(' | ' + fileName + ' -> ');
     if (stderrString) {
       consoleLogError(`Error calculating checksum. `, stderrString);
+      result = status.SUCCESS_WITH_ERRORS;
     }
     printGreen(checksum);
 
@@ -250,7 +252,7 @@ async function calculateChecksumOfFileList(commandExecutionId, fileList, bar) {
     index++;
   }
   eol();
-  // bar.stop();
+  return result;
 }
 
 module.exports = {

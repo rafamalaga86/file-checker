@@ -19,6 +19,7 @@ class ProgressBar {
 
   print() {
     printGreen(`${this.#getPercentage()}%`);
+    print(` ${this.#unit}/${this.#max} `);
     printYellow(` ${this.#dir}`);
     print(' Execution ID: ');
     printGreen(`${this.#executionId}`);

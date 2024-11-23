@@ -50,7 +50,7 @@ async function run() {
       const newLocation = await searchFileNoCase(fileList, checksum.file);
 
       if (!newLocation) {
-        fileListNotFound.push({ id: checksum.id });
+        fileListNotFound.push(checksum);
         printRed('New Location Not Found');
         eol(2);
         continue;
@@ -80,6 +80,7 @@ async function run() {
     consoleLog(
       `There are ${fileListNotFound.length} files that are not found in the dir.`
     );
+
     const ids = fileListNotFound.map(item => item.id);
     const shouldDelete = await ynQuestion('Want to delete them from the DB?');
     if (shouldDelete) {

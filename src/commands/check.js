@@ -11,6 +11,7 @@ const {
 const { calculateChecksumOfFileList } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
 const { ProgressBar } = require('../lib/bar');
+const { status } = require('../enums/status');
 
 function receiveArguments() {
   const dir = process.argv[2];
@@ -46,8 +47,12 @@ async function run() {
       dir = dir.slice(0, -1);
     }
     const bar = new ProgressBar(fileList.length, dir, commandExecutionId);
-    await calculateChecksumOfFileList(commandExecutionId, fileList, bar);
-    await finishCommandExecution(commandExecutionId, status.SUCCESS);
+    const statusResult = await calculateChecksumOfFileList(
+      commandExecutionId,
+      fileList,
+      bar
+    );
+    await finishCommandExecution(commandExecutionId, statusResult);
   } catch (err) {
     if (typeof commandExecutionId !== 'undefined') {
       await finishCommandExecution(commandExecutionId, status.FAILURE);
