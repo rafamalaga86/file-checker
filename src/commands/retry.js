@@ -15,14 +15,18 @@ const { shutDown } = require('../lib/shut-down');
 const { receiveCommandExecutionId, confirmOrAbort } = require('../lib/command-line');
 const { ProgressBar } = require('../lib/bar');
 const { status } = require('../enums/status');
+const { prepareSigint } = require('../lib/sigint-handler');
 
 async function run() {
   let commandExecutionId = receiveCommandExecutionId();
   const commandExists = await exists(commandExecutionId);
+
   if (!commandExists) {
     consoleLogError('That command execution id does not exists');
     process.exit(1);
   }
+
+  prepareSigint(commandExecutionId);
 
   try {
     const failed = await getFailedByCommandId(commandExecutionId);
@@ -31,16 +35,15 @@ async function run() {
       consoleLogError('There are no failed checksums with that command ID');
       process.exit(1);
     }
-
-    consoleLog(`There will be ${failed.length} retries.`);
-
     const fileList = failed.map(item => item.file_path);
+
     const dir = await getDir(commandExecutionId);
     if (!hasDirAccess(dir)) {
       consoleLogError('There are no access to dir: ' + dir);
       process.exit(1);
     }
 
+    consoleLog(`There will be ${failed.length} retries.`);
     await confirmOrAbort();
     await markStatus(commandExecutionId, status.RUNNING);
     await deleteFailedByCommandId(commandExecutionId);

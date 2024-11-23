@@ -12,6 +12,7 @@ const { calculateChecksumOfFileList } = require('../models/checksum');
 const { shutDown } = require('../lib/shut-down');
 const { ProgressBar } = require('../lib/bar');
 const { status } = require('../enums/status');
+const { prepareSigint } = require('../lib/sigint-handler');
 
 function receiveArguments() {
   const dir = process.argv[2];
@@ -43,9 +44,8 @@ async function run() {
 
   try {
     const commandExecutionId = await startCommandExecution(dir);
-    if (dir.endsWith('/')) {
-      dir = dir.slice(0, -1);
-    }
+    prepareSigint(commandExecutionId);
+
     const bar = new ProgressBar(fileList.length, dir, commandExecutionId);
     const statusResult = await calculateChecksumOfFileList(
       commandExecutionId,

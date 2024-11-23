@@ -24,6 +24,7 @@ const {
 const { statusView } = require('../views/complete');
 const { ProgressBar } = require('../lib/bar');
 const { status } = require('../enums/status');
+const { prepareSigint } = require('../lib/sigint-handler');
 
 async function run() {
   const commandExecutionId = receiveCommandExecutionId();
@@ -33,6 +34,8 @@ async function run() {
     consoleLogError('That command execution id does not exists');
     process.exit(1);
   }
+
+  prepareSigint(commandExecutionId);
 
   const dir = await getDir(commandExecutionId);
   if (!hasDirAccess(dir)) {
