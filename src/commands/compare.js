@@ -5,7 +5,6 @@ const {
   consoleLogError,
   eol,
   print,
-  consoleLog,
 } = require('../lib/loggers');
 const { exists } = require('../models/commandExecutions');
 

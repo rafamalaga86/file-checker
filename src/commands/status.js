@@ -7,7 +7,7 @@ async function run() {
   if (executionsNoChecksum.length < 1) {
     consoleLog('All executions have checksums associated');
   } else {
-    print('Processes without checksums: ');
+    print('IDs of executions without checksums: ');
     printYellow(executionsNoChecksum.map(item => item.id).join(', '));
     eol();
   }

@@ -53,6 +53,10 @@ function printList(rows) {
     statusPrint(checksum.status + ' ');
     print(checksum.checksum_count.toString() + ' checksums');
 
+    if (checksum.checksum_count === 0) {
+      printRed(' This execution has 0 checksums');
+    }
+
     if (checksum.failed) {
       printRed(' ' + checksum.failed + ' checksum errors');
     }
