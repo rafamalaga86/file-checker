@@ -51,10 +51,21 @@ async function exists(commandExecutionId) {
   return !!result.length;
 }
 
+async function getById(id) {
+  const connection = await getDbConnection();
+
+  const [result] = await connection.execute(
+    'SELECT * FROM command_executions WHERE id = ? LIMIT 1',
+    [id]
+  );
+  return result.length === 0 ? null : result[0];
+}
+
 module.exports = {
   startCommandExecution,
   finishCommandExecution,
   getDir,
+  getById,
   exists,
   markStatus,
 };

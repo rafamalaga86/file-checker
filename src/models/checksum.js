@@ -72,7 +72,7 @@ async function getByCommandId(commandExecutionId) {
 
   // Insert checksum data into the database
   const [result] = await connection.execute(
-    'SELECT file, checksum FROM checksums WHERE command_execution_id = ?',
+    'SELECT * FROM checksums WHERE command_execution_id = ?',
     [commandExecutionId]
   );
 

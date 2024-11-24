@@ -1,10 +1,12 @@
 const { getByCommandId } = require('../models/checksum');
+const { getById } = require('../models/commandExecutions');
 const {
   printYellow,
   printGreen,
   consoleLogError,
   eol,
   print,
+  printCyan,
 } = require('../lib/loggers');
 const { exists } = require('../models/commandExecutions');
 
@@ -23,43 +25,58 @@ function receiveArguments() {
 async function run() {
   let { id1, id2 } = receiveArguments();
 
-  const command1Exists = await exists(id1);
-  if (!command1Exists) {
+  const command1 = await getById(id1);
+  const command2 = await getById(id2);
+  if (!command1) {
     consoleLogError('The FIRST command execution id does not exists');
     process.exit(1);
   }
-  const command2Exists = await exists(id2);
-  if (!command2Exists) {
+  if (!command2) {
     consoleLogError('The SECOND command execution id does not exists');
     process.exit(1);
   }
 
-  const process1 = await getByCommandId(id1);
-  const process2 = await getByCommandId(id2);
+  const execution1ChecksumsComplete = await getByCommandId(id1);
+  const execution2ChecksumsComplete = await getByCommandId(id2);
 
-  const process1Stringified = process1.map(item => JSON.stringify(item));
-  const process2Stringified = process2.map(item => JSON.stringify(item));
+  const execution1Checksum = execution1ChecksumsComplete.map(item => ({
+    file: item.file,
+    checksum: item.checksum,
+  }));
+  const execution2Checksums = execution2ChecksumsComplete.map(item => ({
+    file: item.file,
+    checksum: item.checksum,
+  }));
+
+  const process1Stringified = execution1Checksum.map(item => JSON.stringify(item));
+  const process2Stringified = execution2Checksums.map(item => JSON.stringify(item));
 
   const filtered1 = process1Stringified.filter(x => !process2Stringified.includes(x));
   const filtered2 = process2Stringified.filter(x => !process1Stringified.includes(x));
 
   print('Process ');
   printYellow(id1);
+  print(' ');
+  printCyan(command1.dir);
   print(' has ');
-  printGreen(process1.length + ' ');
+  printGreen(execution1Checksum.length + ' ');
   print('files');
   eol();
 
   print('Process ');
   printYellow(id2);
+  print(' ');
+  printCyan(command2.dir);
   print(' has ');
-  printGreen(process2.length + ' ');
+  printGreen(execution2Checksums.length + ' ');
   print('files');
   eol();
   eol();
 
   print('Process ');
   printYellow(id1);
+  print(' ');
+  printCyan(command1.dir);
   print(' has ');
   printGreen(filtered1.length);
   print(' files that are not in process ');
@@ -74,8 +91,8 @@ async function run() {
 
   print('Process ');
   printYellow(id2);
-  print(' has ');
-  printGreen(filtered2.length);
+  print(' ');
+  printCyan(command2.dir);
   print(' files that are not in process ');
   printYellow(id1);
   eol();
