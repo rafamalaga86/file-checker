@@ -1,4 +1,4 @@
-const { print, printGreen, printYellow } = require('./loggers');
+const { print, printGreen, printYellow, printMagenta } = require('./loggers');
 
 class ProgressBar {
   constructor(max, dir, executionId) {
@@ -18,11 +18,11 @@ class ProgressBar {
   }
 
   print() {
-    printGreen(`${this.#getPercentage()}%`);
+    printMagenta(`${this.#getPercentage()}%`);
     print(` ${this.#unit}/${this.#max} `);
     printYellow(` ${this.#dir}`);
     print(' Execution ID: ');
-    printGreen(`${this.#executionId}`);
+    printYellow(`${this.#executionId}`);
   }
 
   increment() {

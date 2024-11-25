@@ -83,10 +83,10 @@ function printDir(dir) {
 
 const colors = [
   printGray,
-  printGreen,
+  printCyan,
   printMagenta,
   printYellow,
-  printCyan,
+  printGreen,
   printRed,
   printBlue,
 ];

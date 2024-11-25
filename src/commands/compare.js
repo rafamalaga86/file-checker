@@ -93,6 +93,8 @@ async function run() {
   printYellow(id2);
   print(' ');
   printCyan(command2.dir);
+  print(' has ');
+  printGreen(filtered2.length);
   print(' files that are not in process ');
   printYellow(id1);
   eol();
