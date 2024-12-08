@@ -3,12 +3,13 @@ const { getById } = require('../models/commandExecutions');
 const {
   printYellow,
   printGreen,
+  printRed,
   consoleLogError,
+  consoleLog,
   eol,
   print,
   printCyan,
 } = require('../lib/loggers');
-const { exists } = require('../models/commandExecutions');
 
 function receiveArguments() {
   const id1 = process.argv[2];
@@ -84,11 +85,10 @@ async function run() {
   eol();
 
   if (filtered1.length > 0) {
-    print('Showing them: ');
-    eol();
-    console.log(filtered1);
+    showFiles(filtered1, execution1ChecksumsComplete);
   }
 
+  eol();
   print('Process ');
   printYellow(id2);
   print(' ');
@@ -100,9 +100,7 @@ async function run() {
   eol();
 
   if (filtered2.length > 0) {
-    print('Showing them: ');
-    eol();
-    console.log(filtered2);
+    showFiles(filtered2, execution2ChecksumsComplete);
   }
 
   if (!filtered1.length && !filtered2.length) {
@@ -119,6 +117,25 @@ async function run() {
   }
 
   process.exit(0);
+}
+
+function showFiles(filteredStrings, checksumsComplete) {
+  const files = filteredStrings.map(item => JSON.parse(item).file);
+  const execution1Exclusives = checksumsComplete.filter(item => {
+    return files.includes(item.file);
+  });
+
+  for (const item of execution1Exclusives) {
+    printYellow(item.id + ' ');
+    print(item.file_path + ' ');
+    if (item.checksum) {
+      printGreen(item.checksum);
+    } else {
+      printRed('No Checksum');
+    }
+    eol();
+  }
+  consoleLog('List of IDs: ', execution1Exclusives.map(item => item.id).join(', '));
 }
 
 run();
