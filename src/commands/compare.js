@@ -129,6 +129,7 @@ async function run() {
     const result = await deleteByIds(idsToDelete);
     consoleLog(`Rows deleted: ${result.affectedRows}`);
   }
+  process.exit(0);
 }
 
 function showFiles(filteredStrings, checksumsComplete) {

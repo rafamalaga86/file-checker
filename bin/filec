@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Scripts dir
+SCRIPT_DIR=~/htdocs/file-checker/src/commands
+
+# Check if no arguments were provided
+if [ -z "$1" ]; then
+  # Default to running "filec list" if no arguments are given
+  set -- "list"
+fi
+
+# Handle specific aliases
+if [[ "$1" =~ ^[0-9]+$ ]]; then
+  # If the first argument is a number, treat it as "filec complete <number>"
+  set -- "complete" "$1"
+elif [[ "$1" == "ul" && "$2" =~ ^[0-9]+$ ]]; then
+  # If the first argument is "ul" and the second is a number, treat it as "filec update-locations <number>"
+  set -- "update-locations" "$2"
+fi
+
+# Get script name and other arguments
+SCRIPT_NAME=$1
+shift  # Shift the arguments to the left so that the script's arguments are available.
+
+# Verify if script exists
+if [ ! -f "$SCRIPT_DIR/$SCRIPT_NAME.js" ]; then
+  echo "Error: Script '$SCRIPT_NAME'.js not found in '$SCRIPT_DIR'."
+  exit 1
+fi
+
+# Execute the script with the other arguments
+node "$SCRIPT_DIR/$SCRIPT_NAME.js" "$@"
