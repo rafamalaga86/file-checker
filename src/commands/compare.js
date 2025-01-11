@@ -10,6 +10,10 @@ const {
   print,
   printCyan,
 } = require('../lib/loggers');
+const { ynQuestion } = require('../lib/command-line');
+const { deleteByIds } = require('../models/checksum');
+
+let idsToDelete = [];
 
 function receiveArguments() {
   const id1 = process.argv[2];
@@ -116,7 +120,15 @@ async function run() {
     eol();
   }
 
-  process.exit(0);
+  if (idsToDelete.length === 0) {
+    process.exit(0);
+  }
+
+  const shouldDelete = await ynQuestion('Want to delete these ids from the DB?');
+  if (shouldDelete) {
+    const result = await deleteByIds(idsToDelete);
+    consoleLog(`Rows deleted: ${result.affectedRows}`);
+  }
 }
 
 function showFiles(filteredStrings, checksumsComplete) {
@@ -135,7 +147,10 @@ function showFiles(filteredStrings, checksumsComplete) {
     }
     eol();
   }
-  consoleLog('List of IDs: ', execution1Exclusives.map(item => item.id).join(', '));
+  const execution1ExclusivesArray = execution1Exclusives.map(item => item.id);
+  consoleLog('List of IDs: ', execution1ExclusivesArray.join(', '));
+
+  idsToDelete = idsToDelete.concat(execution1ExclusivesArray);
 }
 
 run();
