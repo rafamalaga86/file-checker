@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { config } = require('../config/config');
+const { printYellow, eol } = require('../lib/loggers');
 
 const ignoredFilesAndDirs = config.ignoredFilesAndDirs;
 
@@ -16,6 +17,11 @@ async function getFileList(currentDir) {
         continue;
       }
 
+      if (!fs.existsSync(filePath)) {
+        printYellow(`Warning: File or directory not found: ${filePath}`);
+        eol();
+        continue;
+      }
       const fileStat = fs.statSync(filePath);
 
       if (fileStat.isDirectory()) {

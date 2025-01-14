@@ -41,6 +41,7 @@ async function run() {
   const fileListWithReplacements = [];
   const fileListNotFound = [];
   const fileList = await getFileList(dir);
+
   for (const checksum of checksums) {
     if (!hasDirAccess(checksum.file_path)) {
       printRed('No access to: ');
